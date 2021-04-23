@@ -152,7 +152,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46a64b79e0328664ab630e683a27d354, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mapSizeX: 0
+  mapSizeY: 0
+  mapSizeZ: 0
+  x: 1.48
+  y: 0.51
+  z: 0.93
   worm: {fileID: 1308579164}
+  seed: 0
 --- !u!4 &114025011
 Transform:
   m_ObjectHideFlags: 0
@@ -456,7 +463,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1308579163}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
