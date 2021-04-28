@@ -155,11 +155,17 @@ MonoBehaviour:
   mapSizeX: 0
   mapSizeY: 0
   mapSizeZ: 0
-  x: 1.48
-  y: 0.51
-  z: 0.93
+  x: 0
+  y: 0
+  z: 0
   worm: {fileID: 1308579164}
   seed: 0
+  lateralSpeed: 0.00024414062
+  segmentCount: 112
+  segmentLength: 0.015625
+  speed: 0.0014648438
+  thickness: 0.015625
+  twistness: 0.015625
 --- !u!4 &114025011
 Transform:
   m_ObjectHideFlags: 0

@@ -56,18 +56,25 @@ public class CaveGen : MonoBehaviour
         valueA = (float)module.GetValue(headNoisePos.x, headNoisePos.y, headNoisePos.z);
         valueB = (float)module2.GetValue(headNoisePos.x, headNoisePos.y, headNoisePos.z);
 
+        valueA = valueA * 2.0f * Mathf.PI;
+        valueB = valueB * 2.0f * Mathf.PI;
+        float test = valueB * 2.0f * Mathf.PI;
+
+
+
         // Direction the worm moves in (opposite direction)
-        headScreenPos.x -= (Mathf.Cos(valueA * 2.0f * Mathf.PI) * Mathf.Sin(valueB * 2.0f * Mathf.PI) * speed);
-        headScreenPos.y -= (Mathf.Sin(valueA * 2.0f * Mathf.PI) * Mathf.Sin(valueB * 2.0f * Mathf.PI) * speed);
-        headScreenPos.z -= (Mathf.Cos(valueB * 2.0f * Mathf.PI) * speed);
+        headScreenPos.x -= (Mathf.Cos(valueA) * Mathf.Sin(valueB) * speed);
+        headScreenPos.y -= (Mathf.Sin(valueA) * Mathf.Sin(valueB) * speed);
+        headScreenPos.z -= (Mathf.Cos(valueB) * speed);
 
         headNoisePos.x -= speed * 2;
         headNoisePos.y += lateralSpeed;
         headNoisePos.z += lateralSpeed;
 
+        worm.position = headScreenPos;
+
         if (!Input.GetKey(KeyCode.Mouse0))
             Draw();
-
     }
 
     void Draw()
@@ -90,7 +97,7 @@ public class CaveGen : MonoBehaviour
             curNoisePos.y = headNoisePos.y;
             curNoisePos.z = headNoisePos.z;
             float noiseValueA = (float)module.GetValue(curNoisePos.x, curNoisePos.y, curNoisePos.z);
-            float noiseValueB = (float)module.GetValue(curNoisePos.x, curNoisePos.y, curNoisePos.z);
+            float noiseValueB = (float)module2.GetValue(curNoisePos.x, curNoisePos.y, curNoisePos.z);
 
             offsetPos.x = Mathf.Cos(noiseValueA * 2.0f * Mathf.PI) * Mathf.Sin(noiseValueB * 2.0f * Mathf.PI);
             offsetPos.y = Mathf.Sin(noiseValueA * 2.0f * Mathf.PI) * Mathf.Sin(noiseValueB * 2.0f * Mathf.PI);
