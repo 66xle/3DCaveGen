@@ -8,24 +8,6 @@ using LibNoise.Unity.Operator;
 
 public class CaveGen : MonoBehaviour
 {
-    // Default worm lateral speed.
-    const double WORM_LATERAL_SPEED = (2.0 / 8192.0);
-
-    // Default length of a worm segment, in screen units.
-    const double WORM_SEGMENT_LENGTH = (1.0 / 64.0);
-
-    // Default segment count for each worm.
-    const int WORM_SEGMENT_COUNT = 112;
-
-    // Default worm speed.
-    const double WORM_SPEED = (3.0 / 2048.0);
-
-    // Default worm thickness.
-    const double WORM_THICKNESS = (4.0 / 256.0);
-
-    // Default "twistiness" of the worms.
-    const double WORM_TWISTINESS = (4.0 / 256.0);
-
     public int mapSizeX;
     public int mapSizeY;
     public int mapSizeZ;
@@ -38,34 +20,39 @@ public class CaveGen : MonoBehaviour
 
     [Header("Worm Values")]
     public int seed = 0;
-
+    public float lateralSpeed = (2.0f / 8192.0f);
+    public int segmentCount = 112;
+    public float segmentLength = (1.0f / 64.0f);
+    public float speed = (3.0f / 2048.0f);
+    public float thickness = (4.0f / 256.0f);
+    public float twistness = (4.0f / 256.0f);
 
     ModuleBase module;
     private float value;
 
     private Vector3 headNoisePos;
-    Vector2 headScreenPos;
-    float lateralSpeed;
-    int segmentCount;
-    float segmentLength;
-    float speed;
-    float thickness;
-    float twistness;
+    private Vector2 headScreenPos;
+    
+
+    List<GameObject> wormSegments;
 
     // Start is called before the first frame update
     void Start()
     {
+        wormSegments = new List<GameObject>();
+
         module = new Perlin(1.0, 2.375, 0.5, 3, seed, QualityMode.Low);
 
         headNoisePos = new Vector3((7.0f / 2048.0f), (1163.0f / 2048.0f), (409.0f / 2048.0f));
-        speed = (float)WORM_SPEED;
-        lateralSpeed = (float)WORM_LATERAL_SPEED;
+
     }
 
     // Update is called once per frame
     void Update()
     {
         value = (float)module.GetValue(headNoisePos.x, headNoisePos.y, headNoisePos.z);
+
+        // Direction the worm moves in (opposite direction)
 
         headScreenPos.x -= (Mathf.Cos(value * 2.0f * Mathf.PI) * speed);
         headScreenPos.y -= (Mathf.Sin(value * 2.0f * Mathf.PI) * speed);
@@ -74,14 +61,43 @@ public class CaveGen : MonoBehaviour
         headNoisePos.y += lateralSpeed;
         headNoisePos.z += lateralSpeed;
 
-        worm.position = headNoisePos;
-
-        if (Input.GetKeyDown(KeyCode.Mouse0))
+        if (!Input.GetKey(KeyCode.Mouse0))
             Draw();
+
     }
 
     void Draw()
     {
+        foreach(GameObject wormSegment in wormSegments)
+        {
+            Destroy(wormSegment);
+        }
+        wormSegments.Clear();
 
+        Vector2 curSegmentScreenPos = headScreenPos;
+        Vector2 offsetPos;
+
+        Vector3 curNoisePos;
+
+
+        for (int curSegment = 0; curSegment < segmentCount; curSegment++)
+        {
+            curNoisePos.x = headNoisePos.x + (curSegment * twistness);
+            curNoisePos.y = headNoisePos.y;
+            curNoisePos.z = headNoisePos.z;
+            float noiseValue = (float)module.GetValue(curNoisePos.x, curNoisePos.y, curNoisePos.z);
+
+            offsetPos.x = Mathf.Cos(noiseValue * 2.0f * Mathf.PI);
+            offsetPos.y = Mathf.Sin(noiseValue * 2.0f * Mathf.PI);
+
+            Vector3 currentPos = new Vector3(curSegmentScreenPos.x + offsetPos.x, worm.position.y, curSegmentScreenPos.y + offsetPos.y);
+
+            GameObject wormSegment = Instantiate(worm.gameObject, currentPos, worm.rotation);
+            wormSegments.Add(wormSegment);
+
+
+            ++curSegment;
+            curSegmentScreenPos += offsetPos;
+        }
     }
 }
