@@ -147,7 +147,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 114025009}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 46a64b79e0328664ab630e683a27d354, type: 3}
   m_Name: 
@@ -165,7 +165,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 114025009}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.58, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -348,18 +348,18 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 885194151}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a03bb436ac0717d4faa42f94a95aba89, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  worm: {fileID: 8319096675303038676, guid: 1e0e361c49cde354e84bf4b62d85d85b, type: 3}
+  worm: {fileID: 4786021686380684214, guid: 194f3b6a2fc3d0747a9dbf1f0add9722, type: 3}
   seed: 0
   segmentCount: 112
   segmentLength: 1
   thickness: 1
-  lateralSpeed: 2
-  speed: 3
+  lateralSpeed: 0.5
+  speed: 1
   twistness: 4
 --- !u!4 &885194153
 Transform:
