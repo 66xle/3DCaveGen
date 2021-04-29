@@ -80,7 +80,7 @@ public class Worm : MonoBehaviour
         headNoisePos.y += LATERALSPEED;
         headNoisePos.z += LATERALSPEED;
 
-        if (!Input.GetKey(KeyCode.Mouse0))
+        if (Input.GetKey(KeyCode.Mouse0))
             MoveWorm();
     }
 
