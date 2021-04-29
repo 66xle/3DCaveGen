@@ -164,7 +164,7 @@ MonoBehaviour:
   segmentLength: 1
   thickness: 1
   lateralSpeed: 0.5
-  speed: 2
+  speed: 1
   twistness: 4
 --- !u!4 &114025011
 Transform:

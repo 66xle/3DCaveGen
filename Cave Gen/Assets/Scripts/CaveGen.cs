@@ -93,11 +93,11 @@ public class CaveGen : MonoBehaviour
 
     void CreateSegments()
     {
-        Vector3 curSegmentScreenPos = headScreenPos;
+        Vector3 curSegmentScreenPos = headScreenPos * 100.0f;
         Vector3 offsetPos;
         Vector3 curNoisePos;
 
-        wormSegments[0].transform.position = headScreenPos;
+        wormSegments[0].transform.position = curSegmentScreenPos;
 
         for (int curSegment = 1; curSegment < segmentCount; curSegment++)
         {
