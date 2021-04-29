@@ -24,9 +24,9 @@ public class CaveGen : MonoBehaviour
     public float segmentLength = 1.0f;
     public float thickness = 1.0f;
 
-    [Tooltip("Speed of the segments")]      public float lateralSpeed = 2.0f;
-    [Tooltip("Speed of the worm/segments")] public float speed = 3.0f;
-    public float twistness = 4.0f;
+    [Tooltip("Default: 2.0f")] public float lateralSpeed = 2.0f; // Speed of the segments
+    [Tooltip("Default: 3.0f")] public float speed = 3.0f;        // Speed of the worm/segments
+    [Tooltip("Default: 4.0f")] public float twistness = 4.0f;
 
 
     private float LATERALSPEED = 2.0f;
@@ -42,12 +42,18 @@ public class CaveGen : MonoBehaviour
     private Vector3 headScreenPos;
     
 
-    List<GameObject> wormSegments;
+    List<GameObject> wormSegments = new List<GameObject>();
 
     // Start is called before the first frame update
     void Start()
     {
-        wormSegments = new List<GameObject>();
+        worm.transform.localScale = new Vector3(thickness, thickness, thickness);
+        
+        for (int i = 0; i < segmentCount; i++)
+        {
+            GameObject wormSegment = Instantiate(worm);
+            wormSegments.Add(wormSegment);
+        }
 
         module = new Perlin(1.0, 2.375, 0.5, 3, seed, QualityMode.Low);
         module2 = new Perlin(1.0, 2.375, 0.5, 3, seed + 1, QualityMode.Low);
@@ -87,43 +93,30 @@ public class CaveGen : MonoBehaviour
 
     void CreateSegments()
     {
-        // Delete worm/segments
-        foreach(GameObject wormSegment in wormSegments)
-        {
-            Destroy(wormSegment);
-        }
-        wormSegments.Clear();
-
         Vector3 curSegmentScreenPos = headScreenPos;
         Vector3 offsetPos;
         Vector3 curNoisePos;
 
-        GameObject wormHead = Instantiate(worm, headScreenPos, worm.transform.rotation);
-        wormHead.transform.localScale = new Vector3(thickness, thickness, thickness);
-        wormSegments.Add(wormHead);
+        wormSegments[0].transform.position = headScreenPos;
 
-        for (int curSegment = 0; curSegment < segmentCount; curSegment++)
+        for (int curSegment = 1; curSegment < segmentCount; curSegment++)
         {
             // Noise Stuff
-            curNoisePos.x = headNoisePos.x + (curSegment * TWISTNESS);
+            curNoisePos.x = headNoisePos.x + (curSegment * 2 * TWISTNESS);
             curNoisePos.y = headNoisePos.y;
             curNoisePos.z = headNoisePos.z;
-            float noiseValueA = (float)module.GetValue(curNoisePos.x, curNoisePos.y, curNoisePos.z);
-            float noiseValueB = (float)module2.GetValue(curNoisePos.x, curNoisePos.y, curNoisePos.z);
+            float noiseValueA = (float)module.GetValue(curNoisePos.x, curNoisePos.y, curNoisePos.z) * 2.0f * Mathf.PI;
+            float noiseValueB = (float)module2.GetValue(curNoisePos.x, curNoisePos.y, curNoisePos.z) * 2.0f * Mathf.PI;
 
             // Offsetting Segment
-            offsetPos.x = Mathf.Cos(noiseValueA * 2.0f * Mathf.PI) * Mathf.Sin(noiseValueB * 2.0f * Mathf.PI);
-            offsetPos.y = Mathf.Sin(noiseValueA * 2.0f * Mathf.PI) * Mathf.Sin(noiseValueB * 2.0f * Mathf.PI);
-            offsetPos.z = Mathf.Cos(noiseValueB * 2.0f * Mathf.PI);
+            offsetPos.x = Mathf.Cos(noiseValueA) * Mathf.Sin(noiseValueB);
+            offsetPos.y = Mathf.Sin(noiseValueA) * Mathf.Sin(noiseValueB);
+            offsetPos.z = Mathf.Cos(noiseValueB);
 
             Vector3 currentPos = curSegmentScreenPos + offsetPos;
 
-            // Create Segment
-            GameObject wormSegment = Instantiate(worm, currentPos, worm.transform.rotation);
-            wormSegment.transform.localScale = new Vector3(thickness, thickness, thickness);
-            wormSegments.Add(wormSegment);
+            wormSegments[curSegment].transform.position = currentPos;
 
-            ++curSegment;
             curSegmentScreenPos += offsetPos;
         }
     }

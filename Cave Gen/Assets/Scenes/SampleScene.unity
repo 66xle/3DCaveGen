@@ -160,11 +160,11 @@ MonoBehaviour:
   z: 0
   worm: {fileID: 8319096675303038676, guid: 1e0e361c49cde354e84bf4b62d85d85b, type: 3}
   seed: 0
-  lateralSpeed: 2
-  segmentCount: 112
+  segmentCount: 63
   segmentLength: 1
-  speed: 3
-  thickness: 4
+  thickness: 1
+  lateralSpeed: 0.5
+  speed: 2
   twistness: 4
 --- !u!4 &114025011
 Transform:
