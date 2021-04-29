@@ -8,77 +8,161 @@ using LibNoise.Unity.Operator;
 
 public class CaveGen : MonoBehaviour
 {
-    public GameObject block;
 
-    public int mapSizeX = 10;
-    public int mapSizeY = 10;
-    public int mapSizeZ = 10;
 
-    public float blockSize = 1.0f;
 
-    private bool caveBuilt = false;
-    float x, y, z;
-    Vector3 spawnBlock;
+    private List<Vector3> newVertices = new List<Vector3>();
+    private List<int> newTriangles = new List<int>();
+    private List<Vector2> newUV = new List<Vector2>();
+
+    private float tUnit = 0.25f;
+    private Vector2 tStone = new Vector2(1, 0);
+    private Vector2 tGrass = new Vector2(0, 1);
+
+    private Mesh mesh;
+    private MeshCollider col;
+
+    private int faceCount;
 
     void Start()
     {
-        spawnBlock = new Vector3(-(mapSizeX * blockSize / 2), mapSizeY * blockSize / 2, mapSizeZ * blockSize / 2);
+        mesh = GetComponent<MeshFilter>().mesh;
+        col = GetComponent<MeshCollider>();
+
+        CubeTop(0, 0, 0, 0);
+        CubeNorth(0, 0, 0, 0);
+        CubeEast(0, 0, 0, 0);
+        CubeSouth(0, 0, 0, 0);
+        CubeWest(0, 0, 0, 0);
+        CubeBottom(0, 0, 0, 0);
+        UpdateMesh();
     }
 
     void Update()
     {
-        if (!caveBuilt)
-        {
-            GameObject wall = Instantiate(block, spawnBlock, block.transform.rotation);
-            wall.transform.localScale = new Vector3(blockSize, blockSize, blockSize);
-            wall.transform.SetParent(transform);
+        
+    }
 
-            spawnBlock.x += blockSize;
-            x++;
+    #region CubeVerticies
 
-            if (x >= mapSizeX)
-            {
-                spawnBlock.x -= blockSize * mapSizeX;
-                spawnBlock.z -= blockSize;
-                x = 0;
-                z++;
+    void CubeTop(int x, int y, int z, byte block)
+    {
+        newVertices.Add(new Vector3(x,     y, z + 1));
+        newVertices.Add(new Vector3(x + 1, y, z + 1));
+        newVertices.Add(new Vector3(x + 1, y, z    ));
+        newVertices.Add(new Vector3(x,     y, z    ));
 
-                if (z >= mapSizeZ)
-                {
-                    spawnBlock.z += blockSize * mapSizeZ;
-                    spawnBlock.y -= blockSize;
-                    z = 0;
-                    y++;
+        Vector2 texturePos = new Vector2();
 
-                    if (y >= mapSizeY)
-                    {
-                        caveBuilt = true;
-                    }
-                }
-            }
+        texturePos = tStone;
 
+        Cube(texturePos);
+    }
 
-            //Vector3 spawnBlock = new Vector3(-(mapSizeX * blockSize / 2), mapSizeY * blockSize / 2, mapSizeZ * blockSize / 2);
-            //for (int y = 0; y < mapSizeX; y++)
-            //{
-            //    for (int z = 0; z < mapSizeX; z++)
-            //    {
-            //        for (int x = 0; x < mapSizeX; x++)
-            //        {
-            //            GameObject wall = Instantiate(block, spawnBlock, block.transform.rotation);
-            //            wall.transform.localScale = new Vector3(blockSize, blockSize, blockSize);
-            //            wall.transform.SetParent(transform);
-            //
-            //            spawnBlock.x += blockSize;
-            //        }
-            //        spawnBlock.x -= blockSize * mapSizeX;
-            //        spawnBlock.z -= blockSize;
-            //    }
-            //    spawnBlock.z += blockSize * mapSizeZ;
-            //    spawnBlock.y -= blockSize;
-            //}
+    void CubeNorth(int x, int y, int z, byte block)
+    {
+        newVertices.Add(new Vector3(x + 1, y - 1, z + 1));
+        newVertices.Add(new Vector3(x + 1, y    , z + 1));
+        newVertices.Add(new Vector3(x    , y    , z + 1));
+        newVertices.Add(new Vector3(x    , y - 1, z + 1));
 
-            //caveBuilt = true;
-        }
+        Vector2 texturePos = new Vector2();
+
+        texturePos = tStone;
+
+        Cube(texturePos);
+    }
+    void CubeEast(int x, int y, int z, byte block)
+    {
+        newVertices.Add(new Vector3(x + 1, y - 1, z    ));
+        newVertices.Add(new Vector3(x + 1, y    , z    ));
+        newVertices.Add(new Vector3(x + 1, y    , z + 1));
+        newVertices.Add(new Vector3(x + 1, y - 1, z + 1));
+
+        Vector2 texturePos;
+
+        texturePos = tStone;
+
+        Cube(texturePos);
+    }
+
+    void CubeSouth(int x, int y, int z, byte block)
+    {
+        newVertices.Add(new Vector3(x    , y - 1, z));
+        newVertices.Add(new Vector3(x    , y    , z));
+        newVertices.Add(new Vector3(x + 1, y    , z));
+        newVertices.Add(new Vector3(x + 1, y - 1, z));
+
+        Vector2 texturePos;
+
+        texturePos = tStone;
+
+        Cube(texturePos);
+    }
+
+    void CubeWest(int x, int y, int z, byte block)
+    {
+        newVertices.Add(new Vector3(x, y - 1, z + 1));
+        newVertices.Add(new Vector3(x, y    , z + 1));
+        newVertices.Add(new Vector3(x, y    , z    ));
+        newVertices.Add(new Vector3(x, y - 1, z    ));
+
+        Vector2 texturePos;
+
+        texturePos = tStone;
+
+        Cube(texturePos);
+    }
+
+    void CubeBottom(int x, int y, int z, byte block)
+    {
+        newVertices.Add(new Vector3(x    , y - 1, z     ));
+        newVertices.Add(new Vector3(x + 1, y - 1, z     ));
+        newVertices.Add(new Vector3(x + 1, y - 1, z + 1));
+        newVertices.Add(new Vector3(x    , y - 1, z + 1));
+
+        Vector2 texturePos;
+
+        texturePos = tStone;
+
+        Cube(texturePos);
+    }
+
+    #endregion
+
+    void Cube(Vector2 texturePos)
+    {
+        newTriangles.Add(faceCount * 4); //1
+        newTriangles.Add(faceCount * 4 + 1); //2
+        newTriangles.Add(faceCount * 4 + 2); //3
+        newTriangles.Add(faceCount * 4); //1
+        newTriangles.Add(faceCount * 4 + 2); //3
+        newTriangles.Add(faceCount * 4 + 3); //4
+
+        newUV.Add(new Vector2(tUnit * texturePos.x + tUnit, tUnit * texturePos.y));
+        newUV.Add(new Vector2(tUnit * texturePos.x + tUnit, tUnit * texturePos.y + tUnit));
+        newUV.Add(new Vector2(tUnit * texturePos.x, tUnit * texturePos.y + tUnit));
+        newUV.Add(new Vector2(tUnit * texturePos.x, tUnit * texturePos.y));
+
+        faceCount++;
+    }
+
+    void UpdateMesh()
+    {
+        mesh.Clear();
+        mesh.vertices = newVertices.ToArray();
+        mesh.uv = newUV.ToArray();
+        mesh.triangles = newTriangles.ToArray();
+        mesh.Optimize();
+        mesh.RecalculateNormals();
+
+        //col.sharedMesh = null;
+        //col.sharedMesh = mesh;
+
+        newVertices.Clear();
+        newUV.Clear();
+        newTriangles.Clear();
+
+        faceCount = 0;
     }
 }
