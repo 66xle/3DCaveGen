@@ -8,8 +8,10 @@ using LibNoise.Unity.Operator;
 
 public class CaveGen : MonoBehaviour
 {
-
-
+    public byte[,,] data;
+    public int mapSizeX = 10;
+    public int mapSizeY = 10;
+    public int mapSizeZ = 10;
 
     private List<Vector3> newVertices = new List<Vector3>();
     private List<int> newTriangles = new List<int>();
@@ -26,16 +28,30 @@ public class CaveGen : MonoBehaviour
 
     void Start()
     {
+        mapSizeX++;
+        mapSizeY++;
+        mapSizeZ++;
+
+        data = new byte[mapSizeX, mapSizeY, mapSizeZ];
+
+        for (int y = 0; y < mapSizeY; y++)
+        {
+            for (int z = 0; z < mapSizeZ; z++)
+            {
+                for (int x = 0; x < mapSizeX; x++)
+                {
+                    if (x > 0 && x < mapSizeX - 1 && y > 0 && y < mapSizeY - 1 && z > 0 && z < mapSizeZ - 1)
+                    {
+                        data[x, y, z] = 1;
+                    }
+                }
+            }
+        }
+
         mesh = GetComponent<MeshFilter>().mesh;
         col = GetComponent<MeshCollider>();
 
-        CubeTop(0, 0, 0, 0);
-        CubeNorth(0, 0, 0, 0);
-        CubeEast(0, 0, 0, 0);
-        CubeSouth(0, 0, 0, 0);
-        CubeWest(0, 0, 0, 0);
-        CubeBottom(0, 0, 0, 0);
-        UpdateMesh();
+        GenerateMesh();
     }
 
     void Update()
@@ -43,6 +59,17 @@ public class CaveGen : MonoBehaviour
         
     }
 
+    public byte Block(int x, int y, int z)
+    {
+        if (x >= mapSizeX || x < 0 || y >= mapSizeY || y < 0 || z >= mapSizeZ || z < 0)
+        {
+            return (byte)1;
+        }
+
+        return data[x, y, z];
+    }
+
+    
     #region CubeVerticies
 
     void CubeTop(int x, int y, int z, byte block)
@@ -128,8 +155,6 @@ public class CaveGen : MonoBehaviour
         Cube(texturePos);
     }
 
-    #endregion
-
     void Cube(Vector2 texturePos)
     {
         newTriangles.Add(faceCount * 4); //1
@@ -147,6 +172,67 @@ public class CaveGen : MonoBehaviour
         faceCount++;
     }
 
+    #endregion
+
+    void GenerateMesh()
+    {
+        for (int x = 0; x < mapSizeX; x++)
+        {
+            for (int y = 0; y < mapSizeY; y++)
+            {
+                for (int z = 0; z < mapSizeZ; z++)
+                {
+                    // If block is solid
+                    if (Block(x, y, z) != 0)
+                    {
+                        
+                        if (Block(x, y + 1, z) == 0)
+                        {
+                            // Block above is air
+                            CubeTop(x, y, z, Block(x, y, z));
+                        }
+                        if (Block(x, y - 1, z) == 0)
+                        {
+                            //Block below is air
+                            CubeBottom(x, y, z, Block(x, y, z));
+
+                        }
+
+                        if (Block(x + 1, y, z) == 0)
+                        {
+                            //Block east is air
+                            CubeEast(x, y, z, Block(x, y, z));
+
+                        }
+
+                        if (Block(x - 1, y, z) == 0)
+                        {
+                            //Block west is air
+                            CubeWest(x, y, z, Block(x, y, z));
+
+                        }
+
+                        if (Block(x, y, z + 1) == 0)
+                        {
+                            //Block north is air
+                            CubeNorth(x, y, z, Block(x, y, z));
+
+                        }
+
+                        if (Block(x, y, z - 1) == 0)
+                        {
+                            //Block south is air
+                            CubeSouth(x, y, z, Block(x, y, z));
+
+                        }
+                    }
+                }
+            }
+        }
+
+        UpdateMesh();
+    }
+
     void UpdateMesh()
     {
         mesh.Clear();
@@ -156,8 +242,8 @@ public class CaveGen : MonoBehaviour
         mesh.Optimize();
         mesh.RecalculateNormals();
 
-        //col.sharedMesh = null;
-        //col.sharedMesh = mesh;
+        col.sharedMesh = null;
+        col.sharedMesh = mesh;
 
         newVertices.Clear();
         newUV.Clear();
