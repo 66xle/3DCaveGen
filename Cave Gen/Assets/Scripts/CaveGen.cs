@@ -13,17 +13,6 @@ public class CaveGen : MonoBehaviour
     public int mapSizeY = 10;
     public int mapSizeZ = 10;
 
-    [Header("Perlin Values")]
-    public double frequency = 1.0;
-    public double lacunarity = 2.375;
-    public double persistence = 0.5;
-    public int octaves = 3;
-    public int seed = 0;
-
-    [Header("Worm Values")]
-    public float lateralSpeed = 2.0f;
-    public float speed = 3.0f;
-
     private List<Vector3> newVertices = new List<Vector3>();
     private List<int> newTriangles = new List<int>();
     private List<Vector2> newUV = new List<Vector2>();
@@ -58,7 +47,11 @@ public class CaveGen : MonoBehaviour
                 {
                     if (x > 0 && x < mapSizeX - 1 && y > 0 && y < mapSizeY - 1 && z > 0 && z < mapSizeZ - 1)
                     {
-                        data[x, y, z] = 1;
+                        // TODO: 3x3 air in middle
+                        if (x != mapSizeX / 2 || y != mapSizeY / 2 || z != mapSizeZ / 2)
+                        {
+                            data[x, y, z] = 1;
+                        }
                     }
                 }
             }
@@ -95,40 +88,6 @@ public class CaveGen : MonoBehaviour
         }
     }
 
-    void Worm()
-    {
-        Vector3 wormPos = new Vector3(mapSizeX / 2, mapSizeY / 2, mapSizeZ / 2);
-
-        Vector3 noisePos = new Vector3((7.0f / 2048.0f), (1163.0f / 2048.0f), (409.0f / 2048.0f));
-
-        ModuleBase perlin = new Perlin(frequency, lacunarity, persistence, octaves, seed, QualityMode.Low);
-        ModuleBase perlin2 = new Perlin(frequency, lacunarity, persistence, octaves, seed + 1, QualityMode.Low);
-
-        float LATERALSPEED = lateralSpeed / 8192.0f;
-        float SPEED = speed / 2048.0f;
-
-        for (int i = 0; i < 100; i++)
-        {
-            float noiseValue = (float)perlin.GetValue(noisePos);
-            float noiseValue2 = (float)perlin2.GetValue(noisePos);
-
-            wormPos.x -= (Mathf.Cos(noiseValue) * Mathf.Sin(noiseValue2) * SPEED * 1000.0f);
-            wormPos.y -= (Mathf.Sin(noiseValue) * Mathf.Sin(noiseValue2) * SPEED * 1000.0f);
-            wormPos.z -= (Mathf.Cos(noiseValue2) * SPEED * 1000.0f);
-
-            Debug.Log(wormPos);
-
-            wormPos.x = Mathf.Clamp(wormPos.x, 0, mapSizeX - 1);
-            wormPos.y = Mathf.Clamp(wormPos.y, 0, mapSizeY - 1);
-            wormPos.z = Mathf.Clamp(wormPos.z, 0, mapSizeZ - 1);
-
-            noisePos += new Vector3(-(SPEED * 2), LATERALSPEED, LATERALSPEED);
-
-
-            data[(int)wormPos.x, (int)wormPos.y, (int)wormPos.z] = 0;
-        }
-    }
-
     public byte Block(int x, int y, int z)
     {
         if (x >= mapSizeX || x < 0 || y >= mapSizeY || y < 0 || z >= mapSizeZ || z < 0)
@@ -140,7 +99,7 @@ public class CaveGen : MonoBehaviour
     }
 
     
-    #region CubeVerticies
+    #region CubeVertices
 
     void CubeTop(int x, int y, int z, byte block)
     {

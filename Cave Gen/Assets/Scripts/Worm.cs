@@ -14,8 +14,14 @@ public class Worm : MonoBehaviour
     private CaveGen script;
     private LayerMask layerMask = (1 << 0);
 
-    [Header("Worm Values")]
+    [Header("Perlin Values")]
+    public double frequency = 1.0;
+    public double lacunarity = 2.375;
+    public double persistence = 0.5;
+    public int octaves = 3;
     public int seed = 0;
+
+    [Header("Worm Values")]
     public int segmentCount = 112;
     public float segmentLength = 1.0f;
     public float thickness = 1.0f;
@@ -56,8 +62,8 @@ public class Worm : MonoBehaviour
             wormSegment.transform.SetParent(transform);
         }
 
-        module = new Perlin(1.0, 2.375, 0.5, 3, seed, QualityMode.Low);
-        module2 = new Perlin(1.0, 2.375, 0.5, 3, seed + 1, QualityMode.Low);
+        module = new Perlin(frequency, lacunarity, persistence, octaves, seed, QualityMode.High);
+        module2 = new Perlin(frequency, lacunarity, persistence, octaves, seed + 1, QualityMode.High);
 
         headNoisePos = new Vector3((7.0f / 2048.0f), (1163.0f / 2048.0f), (409.0f / 2048.0f));
     }
@@ -99,16 +105,18 @@ public class Worm : MonoBehaviour
 
     void MoveWorm()
     {
-        curSegmentScreenPos = headScreenPos * 100.0f;
+        Vector3 originOffSet = new Vector3(script.mapSizeX / 2, script.mapSizeY / 2, script.mapSizeZ / 2);
+
+        curSegmentScreenPos = (headScreenPos * 100.0f) + originOffSet;
         Vector3 offsetPos;
         Vector3 curNoisePos;
 
-        curSegmentScreenPos.x = Mathf.Clamp(curSegmentScreenPos.x, 0, script.mapSizeX - 1);
-        curSegmentScreenPos.y = Mathf.Clamp(curSegmentScreenPos.y, 0, script.mapSizeY - 1);
-        curSegmentScreenPos.z = Mathf.Clamp(curSegmentScreenPos.z, 0, script.mapSizeZ - 1);
+        curSegmentScreenPos.x = Mathf.Clamp(curSegmentScreenPos.x, 1, script.mapSizeX - 1);
+        curSegmentScreenPos.y = Mathf.Clamp(curSegmentScreenPos.y, 1, script.mapSizeY - 1);
+        curSegmentScreenPos.z = Mathf.Clamp(curSegmentScreenPos.z, 1, script.mapSizeZ - 1);
 
         wormSegments[0].transform.position = curSegmentScreenPos; // Set worm head position
-        transform.position = curSegmentScreenPos; // Set worm holder position
+        //transform.position = curSegmentScreenPos; // Set worm holder position
 
         for (int curSegment = 1; curSegment < segmentCount; curSegment++)
         {
