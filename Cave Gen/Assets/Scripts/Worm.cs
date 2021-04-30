@@ -9,6 +9,10 @@ using LibNoise.Unity.Operator;
 public class Worm : MonoBehaviour
 {
     public GameObject worm;
+    public GameObject map;
+
+    private CaveGen script;
+    private LayerMask layerMask = (1 << 0);
 
     [Header("Worm Values")]
     public int seed = 0;
@@ -39,8 +43,11 @@ public class Worm : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        script = map.GetComponent("CaveGen") as CaveGen;
+
         worm.transform.localScale = new Vector3(thickness, thickness, thickness);
 
+        // Spawn segments
         for (int i = 0; i < segmentCount; i++)
         {
             GameObject wormSegment = Instantiate(worm);
@@ -80,7 +87,7 @@ public class Worm : MonoBehaviour
         headNoisePos.y += LATERALSPEED;
         headNoisePos.z += LATERALSPEED;
 
-        if (Input.GetKey(KeyCode.Mouse0))
+        if (!Input.GetKey(KeyCode.Mouse0))
             MoveWorm();
     }
 
@@ -90,8 +97,8 @@ public class Worm : MonoBehaviour
         Vector3 offsetPos;
         Vector3 curNoisePos;
 
-        wormSegments[0].transform.position = curSegmentScreenPos;
-        transform.position = curSegmentScreenPos;
+        wormSegments[0].transform.position = curSegmentScreenPos; // Set worm head position
+        transform.position = curSegmentScreenPos; // Set worm holder position
 
         for (int curSegment = 1; curSegment < segmentCount; curSegment++)
         {
@@ -112,6 +119,34 @@ public class Worm : MonoBehaviour
             wormSegments[curSegment].transform.position = currentPos;
 
             curSegmentScreenPos += offsetPos;
+
+            Raycast(curSegmentScreenPos, wormSegments[curSegment - 1].transform.position);
+        }
+    }
+
+    void Raycast(Vector3 position, Vector3 previousPosition)
+    {
+        RaycastHit hit;
+
+        float distance = Vector3.Distance(position, previousPosition);
+        Vector3 direction = (previousPosition - position).normalized;
+
+        //Debug.DrawRay(position, direction, Color.green);
+
+        if (Physics.SphereCast(position, thickness, direction, out hit, distance))
+        {
+            Debug.DrawLine(position, previousPosition, Color.red);
+
+            Vector3 point = new Vector3(hit.point.x, hit.point.y, hit.point.z);
+            point += (new Vector3(hit.normal.x, hit.normal.y, hit.normal.z)) * -0.5f;
+            
+            script.data[Mathf.RoundToInt(point.x - 0.5f), Mathf.RoundToInt(point.y + 0.5f), Mathf.RoundToInt(point.z - 0.5f)] = 0;
+            
+            script.GenerateMesh();
+        }
+        else
+        {
+            Debug.DrawLine(position, previousPosition, Color.blue);
         }
     }
 }
