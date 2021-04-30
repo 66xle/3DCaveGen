@@ -37,6 +37,7 @@ public class Worm : MonoBehaviour
     private Vector3 headNoisePos;
     private Vector3 headScreenPos;
 
+    private Vector3 curSegmentScreenPos;
 
     List<GameObject> wormSegments = new List<GameObject>();
 
@@ -87,15 +88,24 @@ public class Worm : MonoBehaviour
         headNoisePos.y += LATERALSPEED;
         headNoisePos.z += LATERALSPEED;
 
+        headScreenPos.x = Mathf.Clamp(headScreenPos.x, -1, 1);
+        headScreenPos.y = Mathf.Clamp(headScreenPos.y, -1, 1);
+        headScreenPos.z = Mathf.Clamp(headScreenPos.z, -1, 1);
+
         if (!Input.GetKey(KeyCode.Mouse0))
             MoveWorm();
+
     }
 
     void MoveWorm()
     {
-        Vector3 curSegmentScreenPos = headScreenPos * 100.0f;
+        curSegmentScreenPos = headScreenPos * 100.0f;
         Vector3 offsetPos;
         Vector3 curNoisePos;
+
+        curSegmentScreenPos.x = Mathf.Clamp(curSegmentScreenPos.x, 0, script.mapSizeX - 1);
+        curSegmentScreenPos.y = Mathf.Clamp(curSegmentScreenPos.y, 0, script.mapSizeY - 1);
+        curSegmentScreenPos.z = Mathf.Clamp(curSegmentScreenPos.z, 0, script.mapSizeZ - 1);
 
         wormSegments[0].transform.position = curSegmentScreenPos; // Set worm head position
         transform.position = curSegmentScreenPos; // Set worm holder position
