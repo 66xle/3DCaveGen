@@ -150,6 +150,6 @@ public class Worm : MonoBehaviour
                     Mathf.Clamp(Mathf.RoundToInt(position.y), 1, script.mapSizeY - 2),
                     Mathf.Clamp(Mathf.RoundToInt(position.z), 1, script.mapSizeZ - 2)] = 1;
         
-        script.GenerateMesh();
+        script.CreateMesh();
     }
 }

@@ -1,10 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-using LibNoise.Unity;
+﻿using LibNoise.Unity;
 using LibNoise.Unity.Generator;
 using LibNoise.Unity.Operator;
+using System.Collections.Generic;
+using UnityEngine;
 
 public class CaveGen : MonoBehaviour
 {
@@ -12,6 +10,31 @@ public class CaveGen : MonoBehaviour
     public int mapSizeX = 10;
     public int mapSizeY = 10;
     public int mapSizeZ = 10;
+    public float maxThreshold = 0.5f;
+    public float minThreshold = -0.5f;
+
+    [Header("Perlin Values")]
+    public double frequency = 1.0;
+    public double lacunarity = 2.375;
+    public double persistence = 0.5;
+    public int octaves = 3;
+    public int seed = 0;
+
+    public float displacement = 0.5f;
+    public bool distance = false;
+
+    ModuleBase perlin;
+    ModuleBase rigged;
+    ModuleBase voronoi;
+    ModuleBase add;
+    Vector3 noisePos;
+
+    [Header("Noise Values")]
+    public float noiseScale = 0.05f;
+    public float noiseDivider = 15.0f;
+
+    private float LATERALSPEED = 2.0f;
+    private float SPEED = 3.0f;
 
     private List<Vector3> newVertices = new List<Vector3>();
     private List<int> newTriangles = new List<int>();
@@ -36,28 +59,6 @@ public class CaveGen : MonoBehaviour
         mapSizeX++;
         mapSizeY++;
         mapSizeZ++;
-
-        data = new byte[mapSizeX, mapSizeY, mapSizeZ];
-
-        for (int y = 0; y < mapSizeY; y++)
-        {
-            for (int z = 0; z < mapSizeZ; z++)
-            {
-                for (int x = 0; x < mapSizeX; x++)
-                {
-                    if (x > 0 && x < mapSizeX - 1 && y > 0 && y < mapSizeY - 1 && z > 0 && z < mapSizeZ - 1)
-                    {
-                        //// TODO: 3x3 air in middle
-                        //if (x != mapSizeX / 2 || y != mapSizeY / 2 || z != mapSizeZ / 2)
-                        //{
-                        //    data[x, y, z] = 1;
-                        //}
-                    }
-                }
-            }
-        }
-
-        GenerateMesh();
     }
 
     void Update()
@@ -65,29 +66,18 @@ public class CaveGen : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.H))
             SwapData();
 
-        if (Input.GetKeyDown(KeyCode.G))
+        if (!Input.GetKeyDown(KeyCode.G))
         {
-            mapSizeX++;
-            mapSizeY++;
-            mapSizeZ++;
+            perlin = new Perlin(frequency, lacunarity, persistence, octaves, seed, QualityMode.High);
+            rigged = new RiggedMultifractal(frequency, lacunarity, octaves, seed, QualityMode.High);
+            voronoi = new Voronoi(frequency, displacement, octaves, distance);
+            add = new Add(perlin, rigged);
 
             data = new byte[mapSizeX, mapSizeY, mapSizeZ];
 
-            for (int y = 0; y < mapSizeY; y++)
-            {
-                for (int z = 0; z < mapSizeZ; z++)
-                {
-                    for (int x = 0; x < mapSizeX; x++)
-                    {
-                        if (x > 0 && x < mapSizeX - 1 && y > 0 && y < mapSizeY - 1 && z > 0 && z < mapSizeZ - 1)
-                        {
-                            data[x, y, z] = 1;
-                        }
-                    }
-                }
-            }
+            Generate();
 
-            GenerateMesh();
+            CreateMesh();
         }
     }
 
@@ -226,10 +216,33 @@ public class CaveGen : MonoBehaviour
             }
         }
 
-        GenerateMesh();
+        CreateMesh();
     }
 
-    public void GenerateMesh()
+    void Generate()
+    {
+        for (int y = 0; y < mapSizeY; y++)
+        {
+            for (int z = 0; z < mapSizeZ; z++)
+            {
+                for (int x = 0; x < mapSizeX; x++)
+                {
+                    if (x > 0 && x < mapSizeX - 1 && y > 0 && y < mapSizeY - 1 && z > 0 && z < mapSizeZ - 1)
+                    {
+                        float value = (float)perlin.GetValue(x / noiseDivider, y / noiseDivider, z / noiseDivider);
+                        
+                        if (value >= minThreshold && value <= maxThreshold)
+                        {
+                            data[x, y, z] = 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Add Verts, Triangles and UVs to mesh
+    public void CreateMesh()
     {
         for (int x = 0; x < mapSizeX; x++)
         {
