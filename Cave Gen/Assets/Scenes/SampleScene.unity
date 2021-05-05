@@ -512,15 +512,15 @@ MonoBehaviour:
   worm: {fileID: 4786021686380684214, guid: 194f3b6a2fc3d0747a9dbf1f0add9722, type: 3}
   map: {fileID: 114025009}
   frequency: 1
-  lacunarity: 2
+  lacunarity: 2.375
   persistence: 0.5
   octaves: 3
   seed: 0
   segmentCount: 10
   segmentLength: 1
   thickness: 1
-  lateralSpeed: 0.5
-  speed: 1
+  lateralSpeed: 2
+  speed: 5
   twistness: 4
 --- !u!4 &885194153
 Transform:

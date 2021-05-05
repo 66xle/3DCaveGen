@@ -138,33 +138,18 @@ public class Worm : MonoBehaviour
 
             curSegmentScreenPos += offsetPos;
 
-            Raycast(curSegmentScreenPos, wormSegments[curSegment - 1].transform.position);
+            CarveCave(curSegmentScreenPos, wormSegments[curSegment - 1].transform.position);
         }
     }
 
-    void Raycast(Vector3 position, Vector3 previousPosition)
+    void CarveCave(Vector3 position, Vector3 previousPosition)
     {
-        RaycastHit hit;
+        Debug.DrawLine(position, previousPosition, Color.blue);
 
-        float distance = Vector3.Distance(position, previousPosition);
-        Vector3 direction = (previousPosition - position).normalized;
-
-        //Debug.DrawRay(position, direction, Color.green);
-
-        if (Physics.SphereCast(position, thickness, direction, out hit, distance))
-        {
-            Debug.DrawLine(position, previousPosition, Color.red);
-
-            Vector3 point = new Vector3(hit.point.x, hit.point.y, hit.point.z);
-            point += (new Vector3(hit.normal.x, hit.normal.y, hit.normal.z)) * -0.5f;
-            
-            script.data[Mathf.RoundToInt(point.x - 0.5f), Mathf.RoundToInt(point.y + 0.5f), Mathf.RoundToInt(point.z - 0.5f)] = 0;
-            
-            script.GenerateMesh();
-        }
-        else
-        {
-            Debug.DrawLine(position, previousPosition, Color.blue);
-        }
+        script.data[Mathf.Clamp(Mathf.RoundToInt(position.x), 1, script.mapSizeX - 2), 
+                    Mathf.Clamp(Mathf.RoundToInt(position.y), 1, script.mapSizeY - 2),
+                    Mathf.Clamp(Mathf.RoundToInt(position.z), 1, script.mapSizeZ - 2)] = 1;
+        
+        script.GenerateMesh();
     }
 }
