@@ -47,11 +47,11 @@ public class CaveGen : MonoBehaviour
                 {
                     if (x > 0 && x < mapSizeX - 1 && y > 0 && y < mapSizeY - 1 && z > 0 && z < mapSizeZ - 1)
                     {
-                        // TODO: 3x3 air in middle
-                        if (x != mapSizeX / 2 || y != mapSizeY / 2 || z != mapSizeZ / 2)
-                        {
-                            data[x, y, z] = 1;
-                        }
+                        //// TODO: 3x3 air in middle
+                        //if (x != mapSizeX / 2 || y != mapSizeY / 2 || z != mapSizeZ / 2)
+                        //{
+                        //    data[x, y, z] = 1;
+                        //}
                     }
                 }
             }
@@ -62,6 +62,9 @@ public class CaveGen : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.H))
+            SwapData();
+
         if (Input.GetKeyDown(KeyCode.G))
         {
             mapSizeX++;
@@ -203,6 +206,29 @@ public class CaveGen : MonoBehaviour
 
     #endregion
 
+    void SwapData()
+    {
+        for (int y = 0; y < mapSizeY; y++)
+        {
+            for (int z = 0; z < mapSizeZ; z++)
+            {
+                for (int x = 0; x < mapSizeX; x++)
+                {
+                    if (x > 0 && x < mapSizeX - 1 && y > 0 && y < mapSizeY - 1 && z > 0 && z < mapSizeZ - 1)
+                    {
+                        // If block is air
+                        if (Block(x, y, z) == 0)
+                            data[x, y, z] = 1;
+                        else
+                            data[x, y, z] = 0;
+                    }
+                }
+            }
+        }
+
+        GenerateMesh();
+    }
+
     public void GenerateMesh()
     {
         for (int x = 0; x < mapSizeX; x++)
@@ -224,7 +250,6 @@ public class CaveGen : MonoBehaviour
                         {
                             //Block below is air
                             CubeBottom(x, y, z, Block(x, y, z));
-
                         }
 
                         if (Block(x + 1, y, z) == 0)
