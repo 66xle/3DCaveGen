@@ -155,17 +155,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46a64b79e0328664ab630e683a27d354, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapSizeX: 20
-  mapSizeY: 20
-  mapSizeZ: 20
-  maxValue: 0.5
-  minValue: -0.5
+  mapSizeX: 60
+  mapSizeY: 60
+  mapSizeZ: 60
+  material: {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
   frequency: 1
   lacunarity: 2.375
   persistence: 0.5
   octaves: 3
   seed: 0
   noiseScale: 0.05
+  noiseDivider: 15
+  maxThreshold: 0.5
+  minThreshold: -0.5
+  swapData: 0
 --- !u!4 &114025011
 Transform:
   m_ObjectHideFlags: 0

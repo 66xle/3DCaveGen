@@ -6,12 +6,26 @@ using UnityEngine;
 
 public class CaveGen : MonoBehaviour
 {
+    class MeshData
+    {
+        public List<Vector3> newVertices;
+        public List<int> newTriangles;
+        public List<Vector2> newUV;
+
+        public MeshData()
+        {
+            newVertices = new List<Vector3>();
+            newTriangles = new List<int>();
+            newUV = new List<Vector2>();
+        }
+    }
+
     public byte[,,] data;
     public int mapSizeX = 10;
     public int mapSizeY = 10;
     public int mapSizeZ = 10;
-    public float maxThreshold = 0.5f;
-    public float minThreshold = -0.5f;
+    public Material material;
+
 
     [Header("Perlin Values")]
     public double frequency = 1.0;
@@ -29,10 +43,18 @@ public class CaveGen : MonoBehaviour
     [Header("Noise Values")]
     public float noiseScale = 0.05f;
     public float noiseDivider = 15.0f;
+    public float maxThreshold = 0.5f;
+    public float minThreshold = -0.5f;
 
-    private List<Vector3> newVertices = new List<Vector3>();
-    private List<int> newTriangles = new List<int>();
-    private List<Vector2> newUV = new List<Vector2>();
+    private List<MeshData> meshData = new List<MeshData>();
+    private List<GameObject> meshObject = new List<GameObject>();
+
+    //private List<List<Vector3>> newVertices = new List<List<Vector3>>();
+    //private List<List<int>> newTriangles = new List<List<int>>();
+    //private List<List<Vector2>> newUV = new List<List<Vector2>>();
+
+    private int index = 0;
+    private int vertexCount = 0;
 
     private float tUnit = 0.25f;
     private Vector2 tStone = new Vector2(1, 0);
@@ -47,6 +69,12 @@ public class CaveGen : MonoBehaviour
 
     void Start()
     {
+        //newVertices.Add(new List<Vector3>());
+        //newTriangles.Add(new List<int>());
+        //newUV.Add(new List<Vector2>());
+
+        meshData.Add(new MeshData());
+
         mesh = GetComponent<MeshFilter>().mesh;
         col = GetComponent<MeshCollider>();
 
@@ -71,10 +99,22 @@ public class CaveGen : MonoBehaviour
             //rigged = new RiggedMultifractal(frequency, lacunarity, octaves, seed, QualityMode.High);
             //add = new Add(perlin, rigged);
 
+            DestoryMesh();
+
+            meshData.Add(new MeshData());
+
             data = new byte[mapSizeX, mapSizeY, mapSizeZ];
 
             Generate();
             CreateMesh();
+        }
+    }
+
+    void DestoryMesh()
+    {
+        foreach (GameObject go in meshObject)
+        {
+            Destroy(go);
         }
     }
 
@@ -93,10 +133,17 @@ public class CaveGen : MonoBehaviour
 
     void CubeTop(int x, int y, int z, byte block)
     {
-        newVertices.Add(new Vector3(x,     y, z + 1));
-        newVertices.Add(new Vector3(x + 1, y, z + 1));
-        newVertices.Add(new Vector3(x + 1, y, z    ));
-        newVertices.Add(new Vector3(x,     y, z    ));
+        CheckVertex();
+
+        meshData[index].newVertices.Add(new Vector3(x, y, z + 1));
+        meshData[index].newVertices.Add(new Vector3(x + 1, y, z + 1));
+        meshData[index].newVertices.Add(new Vector3(x + 1, y, z));
+        meshData[index].newVertices.Add(new Vector3(x, y, z));
+
+        //newVertices[index].Add(new Vector3(x,     y, z + 1));
+        //newVertices[index].Add(new Vector3(x + 1, y, z + 1));
+        //newVertices[index].Add(new Vector3(x + 1, y, z    ));
+        //newVertices[index].Add(new Vector3(x,     y, z    ));
 
         Vector2 texturePos = new Vector2();
 
@@ -107,10 +154,17 @@ public class CaveGen : MonoBehaviour
 
     void CubeNorth(int x, int y, int z, byte block)
     {
-        newVertices.Add(new Vector3(x + 1, y - 1, z + 1));
-        newVertices.Add(new Vector3(x + 1, y    , z + 1));
-        newVertices.Add(new Vector3(x    , y    , z + 1));
-        newVertices.Add(new Vector3(x    , y - 1, z + 1));
+        CheckVertex();
+
+        meshData[index].newVertices.Add(new Vector3(x + 1, y - 1, z + 1));
+        meshData[index].newVertices.Add(new Vector3(x + 1, y    , z + 1));
+        meshData[index].newVertices.Add(new Vector3(x    , y    , z + 1));
+        meshData[index].newVertices.Add(new Vector3(x    , y - 1, z + 1));
+
+        //newVertices[index].Add(new Vector3(x + 1, y - 1, z + 1));
+        //newVertices[index].Add(new Vector3(x + 1, y    , z + 1));
+        //newVertices[index].Add(new Vector3(x    , y    , z + 1));
+        //newVertices[index].Add(new Vector3(x    , y - 1, z + 1));
 
         Vector2 texturePos = new Vector2();
 
@@ -120,10 +174,17 @@ public class CaveGen : MonoBehaviour
     }
     void CubeEast(int x, int y, int z, byte block)
     {
-        newVertices.Add(new Vector3(x + 1, y - 1, z    ));
-        newVertices.Add(new Vector3(x + 1, y    , z    ));
-        newVertices.Add(new Vector3(x + 1, y    , z + 1));
-        newVertices.Add(new Vector3(x + 1, y - 1, z + 1));
+        CheckVertex();
+
+        meshData[index].newVertices.Add(new Vector3(x + 1, y - 1, z));
+        meshData[index].newVertices.Add(new Vector3(x + 1, y, z));
+        meshData[index].newVertices.Add(new Vector3(x + 1, y, z + 1));
+        meshData[index].newVertices.Add(new Vector3(x + 1, y - 1, z + 1));
+
+        //newVertices[index].Add(new Vector3(x + 1, y - 1, z    ));
+        //newVertices[index].Add(new Vector3(x + 1, y    , z    ));
+        //newVertices[index].Add(new Vector3(x + 1, y    , z + 1));
+        //newVertices[index].Add(new Vector3(x + 1, y - 1, z + 1));
 
         Vector2 texturePos;
 
@@ -134,10 +195,17 @@ public class CaveGen : MonoBehaviour
 
     void CubeSouth(int x, int y, int z, byte block)
     {
-        newVertices.Add(new Vector3(x    , y - 1, z));
-        newVertices.Add(new Vector3(x    , y    , z));
-        newVertices.Add(new Vector3(x + 1, y    , z));
-        newVertices.Add(new Vector3(x + 1, y - 1, z));
+        CheckVertex();
+
+        meshData[index].newVertices.Add(new Vector3(x, y - 1, z));
+        meshData[index].newVertices.Add(new Vector3(x, y, z));
+        meshData[index].newVertices.Add(new Vector3(x + 1, y, z));
+        meshData[index].newVertices.Add(new Vector3(x + 1, y - 1, z));
+
+        //newVertices[index].Add(new Vector3(x    , y - 1, z));
+        //newVertices[index].Add(new Vector3(x    , y    , z));
+        //newVertices[index].Add(new Vector3(x + 1, y    , z));
+        //newVertices[index].Add(new Vector3(x + 1, y - 1, z));
 
         Vector2 texturePos;
 
@@ -148,10 +216,17 @@ public class CaveGen : MonoBehaviour
 
     void CubeWest(int x, int y, int z, byte block)
     {
-        newVertices.Add(new Vector3(x, y - 1, z + 1));
-        newVertices.Add(new Vector3(x, y    , z + 1));
-        newVertices.Add(new Vector3(x, y    , z    ));
-        newVertices.Add(new Vector3(x, y - 1, z    ));
+        CheckVertex();
+
+        meshData[index].newVertices.Add(new Vector3(x, y - 1, z + 1));
+        meshData[index].newVertices.Add(new Vector3(x, y, z + 1));
+        meshData[index].newVertices.Add(new Vector3(x, y, z));
+        meshData[index].newVertices.Add(new Vector3(x, y - 1, z));
+
+        //newVertices[index].Add(new Vector3(x, y - 1, z + 1));
+        //newVertices[index].Add(new Vector3(x, y    , z + 1));
+        //newVertices[index].Add(new Vector3(x, y    , z    ));
+        //newVertices[index].Add(new Vector3(x, y - 1, z    ));
 
         Vector2 texturePos;
 
@@ -162,10 +237,17 @@ public class CaveGen : MonoBehaviour
 
     void CubeBottom(int x, int y, int z, byte block)
     {
-        newVertices.Add(new Vector3(x    , y - 1, z     ));
-        newVertices.Add(new Vector3(x + 1, y - 1, z     ));
-        newVertices.Add(new Vector3(x + 1, y - 1, z + 1));
-        newVertices.Add(new Vector3(x    , y - 1, z + 1));
+        CheckVertex();
+
+        meshData[index].newVertices.Add(new Vector3(x, y - 1, z));
+        meshData[index].newVertices.Add(new Vector3(x + 1, y - 1, z));
+        meshData[index].newVertices.Add(new Vector3(x + 1, y - 1, z + 1));
+        meshData[index].newVertices.Add(new Vector3(x, y - 1, z + 1));
+
+        //newVertices[index].Add(new Vector3(x    , y - 1, z     ));
+        //newVertices[index].Add(new Vector3(x + 1, y - 1, z     ));
+        //newVertices[index].Add(new Vector3(x + 1, y - 1, z + 1));
+        //newVertices[index].Add(new Vector3(x    , y - 1, z + 1));
 
         Vector2 texturePos;
 
@@ -176,19 +258,46 @@ public class CaveGen : MonoBehaviour
 
     void Cube(Vector2 texturePos)
     {
-        newTriangles.Add(faceCount * 4); //1
-        newTriangles.Add(faceCount * 4 + 1); //2
-        newTriangles.Add(faceCount * 4 + 2); //3
-        newTriangles.Add(faceCount * 4); //1
-        newTriangles.Add(faceCount * 4 + 2); //3
-        newTriangles.Add(faceCount * 4 + 3); //4
+        meshData[index].newTriangles.Add(faceCount * 4);     //1
+        meshData[index].newTriangles.Add(faceCount * 4 + 1); //2
+        meshData[index].newTriangles.Add(faceCount * 4 + 2); //3
+        meshData[index].newTriangles.Add(faceCount * 4);     //1
+        meshData[index].newTriangles.Add(faceCount * 4 + 2); //3
+        meshData[index].newTriangles.Add(faceCount * 4 + 3); //4
 
-        newUV.Add(new Vector2(tUnit * texturePos.x + tUnit, tUnit * texturePos.y));
-        newUV.Add(new Vector2(tUnit * texturePos.x + tUnit, tUnit * texturePos.y + tUnit));
-        newUV.Add(new Vector2(tUnit * texturePos.x, tUnit * texturePos.y + tUnit));
-        newUV.Add(new Vector2(tUnit * texturePos.x, tUnit * texturePos.y));
+        meshData[index].newUV.Add(new Vector2(tUnit * texturePos.x + tUnit, tUnit * texturePos.y));
+        meshData[index].newUV.Add(new Vector2(tUnit * texturePos.x + tUnit, tUnit * texturePos.y + tUnit));
+        meshData[index].newUV.Add(new Vector2(tUnit * texturePos.x, tUnit * texturePos.y + tUnit));
+        meshData[index].newUV.Add(new Vector2(tUnit * texturePos.x, tUnit * texturePos.y));
+
+
+        //newTriangles[index].Add(faceCount * 4);     //1
+        //newTriangles[index].Add(faceCount * 4 + 1); //2
+        //newTriangles[index].Add(faceCount * 4 + 2); //3
+        //newTriangles[index].Add(faceCount * 4);     //1
+        //newTriangles[index].Add(faceCount * 4 + 2); //3
+        //newTriangles[index].Add(faceCount * 4 + 3); //4
+        //
+        //newUV[index].Add(new Vector2(tUnit * texturePos.x + tUnit, tUnit * texturePos.y));
+        //newUV[index].Add(new Vector2(tUnit * texturePos.x + tUnit, tUnit * texturePos.y + tUnit));
+        //newUV[index].Add(new Vector2(tUnit * texturePos.x, tUnit * texturePos.y + tUnit));
+        //newUV[index].Add(new Vector2(tUnit * texturePos.x, tUnit * texturePos.y));
 
         faceCount++;
+    }
+
+    void CheckVertex()
+    {
+        vertexCount += 4;
+
+        if (vertexCount >= 65536)
+        {
+            meshData.Add(new MeshData());
+
+            vertexCount = 0;
+            faceCount = 0;
+            index++;
+        }
     }
 
     #endregion
@@ -294,7 +403,6 @@ public class CaveGen : MonoBehaviour
                         {
                             //Block south is air
                             CubeSouth(x, y, z, Block(x, y, z));
-
                         }
                     }
                 }
@@ -306,20 +414,43 @@ public class CaveGen : MonoBehaviour
 
     void UpdateMesh()
     {
-        mesh.Clear();
-        mesh.vertices = newVertices.ToArray();
-        mesh.uv = newUV.ToArray();
-        mesh.triangles = newTriangles.ToArray();
-        mesh.Optimize();
-        mesh.RecalculateNormals();
+        foreach (MeshData data in meshData)
+        {
+            GameObject go = new GameObject("Mesh");
 
-        col.sharedMesh = null;
-        col.sharedMesh = mesh;
+            go.transform.SetParent(transform);
 
-        newVertices.Clear();
-        newUV.Clear();
-        newTriangles.Clear();
+            MeshRenderer renderer = go.AddComponent<MeshRenderer>();
+            renderer.material = material;
+            
+            Mesh mesh = go.AddComponent<MeshFilter>().mesh;
+            mesh.vertices = data.newVertices.ToArray();
+            mesh.triangles = data.newTriangles.ToArray();
+            mesh.uv = data.newUV.ToArray();
+            mesh.Optimize();
+            mesh.RecalculateNormals();
 
+            meshObject.Add(go);
+        }
+
+        meshData.Clear();
+
+        //mesh.Clear();
+        //mesh.vertices = newVertices[index].ToArray();
+        //mesh.uv = newUV[index].ToArray();
+        //mesh.triangles = newTriangles[index].ToArray();
+        //mesh.Optimize();
+        //mesh.RecalculateNormals();
+        //
+        //col.sharedMesh = null;
+        //col.sharedMesh = mesh;
+        //
+        //newVertices.Clear();
+        //newUV.Clear();
+        //newTriangles.Clear();
+
+        vertexCount = 0;
+        index = 0;
         faceCount = 0;
     }
 }
