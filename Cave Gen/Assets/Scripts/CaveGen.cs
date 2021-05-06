@@ -20,9 +20,6 @@ public class CaveGen : MonoBehaviour
     public int octaves = 3;
     public int seed = 0;
 
-    public float displacement = 0.5f;
-    public bool distance = false;
-
     ModuleBase perlin;
     ModuleBase rigged;
     ModuleBase voronoi;
@@ -32,9 +29,6 @@ public class CaveGen : MonoBehaviour
     [Header("Noise Values")]
     public float noiseScale = 0.05f;
     public float noiseDivider = 15.0f;
-
-    private float LATERALSPEED = 2.0f;
-    private float SPEED = 3.0f;
 
     private List<Vector3> newVertices = new List<Vector3>();
     private List<int> newTriangles = new List<int>();
@@ -49,7 +43,7 @@ public class CaveGen : MonoBehaviour
 
     private int faceCount;
 
-    private LayerMask layerMask = (0 << 1);
+    [SerializeField] public bool swapData = false;
 
     void Start()
     {
@@ -59,6 +53,11 @@ public class CaveGen : MonoBehaviour
         mapSizeX++;
         mapSizeY++;
         mapSizeZ++;
+
+        data = new byte[mapSizeX, mapSizeY, mapSizeZ];
+
+        Generate();
+        CreateMesh();
     }
 
     void Update()
@@ -66,17 +65,15 @@ public class CaveGen : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.H))
             SwapData();
 
-        if (!Input.GetKeyDown(KeyCode.G))
+        if (Input.GetKeyDown(KeyCode.G))
         {
-            perlin = new Perlin(frequency, lacunarity, persistence, octaves, seed, QualityMode.High);
-            rigged = new RiggedMultifractal(frequency, lacunarity, octaves, seed, QualityMode.High);
-            voronoi = new Voronoi(frequency, displacement, octaves, distance);
-            add = new Add(perlin, rigged);
+            //perlin = new Perlin(frequency, lacunarity, persistence, octaves, seed, QualityMode.High);
+            //rigged = new RiggedMultifractal(frequency, lacunarity, octaves, seed, QualityMode.High);
+            //add = new Add(perlin, rigged);
 
             data = new byte[mapSizeX, mapSizeY, mapSizeZ];
 
             Generate();
-
             CreateMesh();
         }
     }
@@ -216,6 +213,11 @@ public class CaveGen : MonoBehaviour
             }
         }
 
+        if (swapData)
+            swapData = false;
+        else
+            swapData = true;
+
         CreateMesh();
     }
 
@@ -229,12 +231,14 @@ public class CaveGen : MonoBehaviour
                 {
                     if (x > 0 && x < mapSizeX - 1 && y > 0 && y < mapSizeY - 1 && z > 0 && z < mapSizeZ - 1)
                     {
-                        float value = (float)perlin.GetValue(x / noiseDivider, y / noiseDivider, z / noiseDivider);
-                        
-                        if (value >= minThreshold && value <= maxThreshold)
-                        {
-                            data[x, y, z] = 1;
-                        }
+                        data[x, y, z] = 1;
+
+                        //float value = (float)perlin.GetValue(x / noiseDivider, y / noiseDivider, z / noiseDivider);
+                        //
+                        //if (value >= minThreshold && value <= maxThreshold)
+                        //{
+                        //    data[x, y, z] = 1;
+                        //}
                     }
                 }
             }

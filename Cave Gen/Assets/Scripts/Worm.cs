@@ -146,9 +146,16 @@ public class Worm : MonoBehaviour
     {
         Debug.DrawLine(position, previousPosition, Color.blue);
 
+        byte block;
+
+        if (script.swapData)
+            block = 1; // Solid
+        else
+            block = 0; // Air
+
         script.data[Mathf.Clamp(Mathf.RoundToInt(position.x), 1, script.mapSizeX - 2), 
                     Mathf.Clamp(Mathf.RoundToInt(position.y), 1, script.mapSizeY - 2),
-                    Mathf.Clamp(Mathf.RoundToInt(position.z), 1, script.mapSizeZ - 2)] = 1;
+                    Mathf.Clamp(Mathf.RoundToInt(position.z), 1, script.mapSizeZ - 2)] = block;
         
         script.CreateMesh();
     }
