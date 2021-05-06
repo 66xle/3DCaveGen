@@ -66,11 +66,10 @@ public class CaveGen : MonoBehaviour
     private int faceCount;
 
     [SerializeField] public bool swapData = false;
+    private bool updateMesh = false;
 
     void Start()
     {
-        meshData.Add(new MeshData());
-
         mesh = GetComponent<MeshFilter>().mesh;
         col = GetComponent<MeshCollider>();
 
@@ -91,9 +90,9 @@ public class CaveGen : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.G))
         {
-            DestoryMesh();
+            updateMesh = false;
 
-            meshData.Add(new MeshData());
+            DestoryMesh();
 
             data = new byte[mapSizeX, mapSizeY, mapSizeZ];
 
@@ -306,6 +305,8 @@ public class CaveGen : MonoBehaviour
     // Add Verts, Triangles and UVs to mesh
     public void CreateMesh()
     {
+        meshData.Add(new MeshData());
+
         for (int x = 0; x < mapSizeX; x++)
         {
             for (int y = 0; y < mapSizeY; y++)
@@ -363,24 +364,40 @@ public class CaveGen : MonoBehaviour
 
     void UpdateMesh()
     {
-        foreach (MeshData data in meshData)
+        for (int i = 0; i < meshData.Count; i++)
         {
-            GameObject go = new GameObject("Mesh");
+            MeshData data = meshData[i];
 
-            go.transform.SetParent(transform);
+            Mesh mesh;
 
-            MeshRenderer renderer = go.AddComponent<MeshRenderer>();
-            renderer.material = material;
-            
-            Mesh mesh = go.AddComponent<MeshFilter>().mesh;
+            // When generating new cave
+            if (!updateMesh)
+            {
+                GameObject go = new GameObject("Mesh");
+
+                go.transform.SetParent(transform);
+
+                MeshRenderer renderer = go.AddComponent<MeshRenderer>();
+                renderer.material = material;
+
+                mesh = go.AddComponent<MeshFilter>().mesh;
+
+                meshObject.Add(go);
+            }
+            else
+            {
+                mesh = transform.GetChild(i).GetComponent<MeshFilter>().mesh;
+            }
+
+            mesh.Clear();
             mesh.vertices = data.newVertices.ToArray();
             mesh.triangles = data.newTriangles.ToArray();
             mesh.uv = data.newUV.ToArray();
             mesh.Optimize();
             mesh.RecalculateNormals();
-
-            meshObject.Add(go);
         }
+
+        updateMesh = true;
 
         meshData.Clear();
 
