@@ -70,10 +70,6 @@ public class CaveGen : MonoBehaviour
 
     void Start()
     {
-        //mapSizeX++;
-        //mapSizeY++;
-        //mapSizeZ++;
-
         data = new byte[mapSizeX, mapSizeY, mapSizeZ];
 
         Generate();
@@ -86,9 +82,7 @@ public class CaveGen : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.G))
         {
-
             updateMesh = false;
-
 
             data = new byte[mapSizeX, mapSizeY, mapSizeZ];
 
@@ -289,20 +283,22 @@ public class CaveGen : MonoBehaviour
             {
                 for (int x = 0; x < mapSizeX; x++)
                 {
+                    perlin = new Perlin(frequency, lacunarity, persistence, octaves, seed, QualityMode.High);
+                    rigged = new RiggedMultifractal(frequency, lacunarity, octaves, seed, QualityMode.High);
+                    voronoi = new Voronoi(frequency, displacement, seed, distance);
+
+                    add = new Add(perlin, rigged);
+
+                    float value = (float)add.GetValue(x / noiseDivider, y / noiseDivider, z / noiseDivider);
+
+                    if (value >= minThreshold && value <= maxThreshold)
+                    {
+                        data[x, y, z] = 1;
+                    }
+
                     if (x > 0 && x < mapSizeX - 1 && y > 0 && y < mapSizeY - 1 && z > 0 && z < mapSizeZ - 1)
                     {
-                        perlin = new Perlin(frequency, lacunarity, persistence, octaves, seed, QualityMode.High);
-                        rigged = new RiggedMultifractal(frequency, lacunarity, octaves, seed, QualityMode.High);
-                        voronoi = new Voronoi(frequency, displacement, seed, distance);
-
-                        add = new Add(perlin, rigged);
-
-                        float value = (float)add.GetValue(x / noiseDivider, y / noiseDivider, z / noiseDivider);
                         
-                        if (value >= minThreshold && value <= maxThreshold)
-                        {
-                            data[x, y, z] = 1;
-                        }
                     }
                 }
             }
