@@ -76,7 +76,6 @@ public class CaveGen : MonoBehaviour
         data = new byte[mapSizeX, mapSizeY, mapSizeZ];
 
         Generate();
-        CreateMesh();
     }
 
     void Update()
@@ -94,7 +93,6 @@ public class CaveGen : MonoBehaviour
             data = new byte[mapSizeX, mapSizeY, mapSizeZ];
 
             Generate();
-            CreateMesh();
         }
     }
 
@@ -314,6 +312,7 @@ public class CaveGen : MonoBehaviour
                 }
             }
         }
+        CreateMesh();
     }
 
     // Add Verts, Triangles and UVs to mesh
