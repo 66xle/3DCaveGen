@@ -19,13 +19,12 @@ public class CaveGen : MonoBehaviour
             newUV = new List<Vector2>();
         }
     }
-
+    [Header("Cave Values")]
     public byte[,,] data;
     public int mapSizeX = 10;
     public int mapSizeY = 10;
     public int mapSizeZ = 10;
     public Material material;
-
 
     [Header("Perlin Values")]
     public double frequency = 1.0;
@@ -38,18 +37,19 @@ public class CaveGen : MonoBehaviour
     public float displacement = 1;
     public bool distance = false;
 
-    ModuleBase perlin;
-    ModuleBase rigged;
-    ModuleBase voronoi;
-    ModuleBase add;
-    Vector3 noisePos;
-
     [Header("Noise Values")]
     public float noiseScale = 0.05f;
     public float noiseDivider = 15.0f;
     public float maxThreshold = 0.5f;
     public float minThreshold = -0.5f;
 
+    ModuleBase perlin;
+    ModuleBase rigged;
+    ModuleBase voronoi;
+    ModuleBase add;
+    Vector3 noisePos;
+
+    // Mesh Stuff
     private List<MeshData> meshData = new List<MeshData>();
     private List<GameObject> meshObject = new List<GameObject>();
 
@@ -62,6 +62,7 @@ public class CaveGen : MonoBehaviour
 
     private int faceCount;
 
+    // Bool
     [SerializeField] public bool swapData = false;
     private bool updateMesh = false;
 
@@ -69,9 +70,9 @@ public class CaveGen : MonoBehaviour
 
     void Start()
     {
-        mapSizeX++;
-        mapSizeY++;
-        mapSizeZ++;
+        //mapSizeX++;
+        //mapSizeY++;
+        //mapSizeZ++;
 
         data = new byte[mapSizeX, mapSizeY, mapSizeZ];
 
@@ -88,10 +89,10 @@ public class CaveGen : MonoBehaviour
 
             updateMesh = false;
 
-            DestoryMesh();
 
             data = new byte[mapSizeX, mapSizeY, mapSizeZ];
 
+            DestoryMesh();
             Generate();
         }
     }
@@ -290,12 +291,6 @@ public class CaveGen : MonoBehaviour
                 {
                     if (x > 0 && x < mapSizeX - 1 && y > 0 && y < mapSizeY - 1 && z > 0 && z < mapSizeZ - 1)
                     {
-                        //if (swapData)
-                        //    data[x, y, z] = 0;
-                        //else
-                        //    data[x, y, z] = 1;
-
-
                         perlin = new Perlin(frequency, lacunarity, persistence, octaves, seed, QualityMode.High);
                         rigged = new RiggedMultifractal(frequency, lacunarity, octaves, seed, QualityMode.High);
                         voronoi = new Voronoi(frequency, displacement, seed, distance);
@@ -329,40 +324,40 @@ public class CaveGen : MonoBehaviour
                     // If block is solid
                     if (Block(x, y, z) != 0)
                     {
-                        
-                        if (Block(x, y + 1, z) == 0)
+                        if (Block(x, y + 1, z) == 0 || y == mapSizeY - 1)
                         {
                             // Block above is air
                             CubeTop(x, y, z, Block(x, y, z));
                         }
-                        if (Block(x, y - 1, z) == 0)
+
+                        if (Block(x, y - 1, z) == 0 || y == 0)
                         {
                             //Block below is air
                             CubeBottom(x, y, z, Block(x, y, z));
                         }
 
-                        if (Block(x + 1, y, z) == 0)
+                        if (Block(x + 1, y, z) == 0 || x == mapSizeX - 1)
                         {
                             //Block east is air
                             CubeEast(x, y, z, Block(x, y, z));
 
                         }
 
-                        if (Block(x - 1, y, z) == 0)
+                        if (Block(x - 1, y, z) == 0 || x == 0)
                         {
                             //Block west is air
                             CubeWest(x, y, z, Block(x, y, z));
 
                         }
 
-                        if (Block(x, y, z + 1) == 0)
+                        if (Block(x, y, z + 1) == 0 || z == mapSizeZ - 1)
                         {
                             //Block north is air
                             CubeNorth(x, y, z, Block(x, y, z));
 
                         }
 
-                        if (Block(x, y, z - 1) == 0)
+                        if (Block(x, y, z - 1) == 0 || z == 0)
                         {
                             //Block south is air
                             CubeSouth(x, y, z, Block(x, y, z));
