@@ -34,6 +34,10 @@ public class CaveGen : MonoBehaviour
     public int octaves = 3;
     public int seed = 0;
 
+    [Header("Voronoi Values")]
+    public float displacement = 1;
+    public bool distance = false;
+
     ModuleBase perlin;
     ModuleBase rigged;
     ModuleBase voronoi;
@@ -49,10 +53,6 @@ public class CaveGen : MonoBehaviour
     private List<MeshData> meshData = new List<MeshData>();
     private List<GameObject> meshObject = new List<GameObject>();
 
-    //private List<List<Vector3>> newVertices = new List<List<Vector3>>();
-    //private List<List<int>> newTriangles = new List<List<int>>();
-    //private List<List<Vector2>> newUV = new List<List<Vector2>>();
-
     private int index = 0;
     private int vertexCount = 0;
 
@@ -60,19 +60,15 @@ public class CaveGen : MonoBehaviour
     private Vector2 tStone = new Vector2(1, 0);
     private Vector2 tGrass = new Vector2(0, 1);
 
-    private Mesh mesh;
-    private MeshCollider col;
-
     private int faceCount;
 
     [SerializeField] public bool swapData = false;
     private bool updateMesh = false;
 
+    private float startTime;
+
     void Start()
     {
-        mesh = GetComponent<MeshFilter>().mesh;
-        col = GetComponent<MeshCollider>();
-
         mapSizeX++;
         mapSizeY++;
         mapSizeZ++;
@@ -90,6 +86,7 @@ public class CaveGen : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.G))
         {
+
             updateMesh = false;
 
             DestoryMesh();
@@ -252,6 +249,8 @@ public class CaveGen : MonoBehaviour
 
     void SwapData()
     {
+        startTime = Time.realtimeSinceStartup;
+
         for (int y = 0; y < mapSizeY; y++)
         {
             for (int z = 0; z < mapSizeZ; z++)
@@ -275,11 +274,16 @@ public class CaveGen : MonoBehaviour
         else
             swapData = true;
 
+        updateMesh = false;
+
+        DestoryMesh();
         CreateMesh();
     }
 
     void Generate()
     {
+        startTime = Time.realtimeSinceStartup;
+
         for (int y = 0; y < mapSizeY; y++)
         {
             for (int z = 0; z < mapSizeZ; z++)
@@ -288,14 +292,24 @@ public class CaveGen : MonoBehaviour
                 {
                     if (x > 0 && x < mapSizeX - 1 && y > 0 && y < mapSizeY - 1 && z > 0 && z < mapSizeZ - 1)
                     {
-                        data[x, y, z] = 1;
-
-                        //float value = (float)perlin.GetValue(x / noiseDivider, y / noiseDivider, z / noiseDivider);
-                        //
-                        //if (value >= minThreshold && value <= maxThreshold)
-                        //{
+                        //if (swapData)
+                        //    data[x, y, z] = 0;
+                        //else
                         //    data[x, y, z] = 1;
-                        //}
+
+
+                        perlin = new Perlin(frequency, lacunarity, persistence, octaves, seed, QualityMode.High);
+                        rigged = new RiggedMultifractal(frequency, lacunarity, octaves, seed, QualityMode.High);
+                        voronoi = new Voronoi(frequency, displacement, seed, distance);
+
+                        add = new Add(perlin, rigged);
+
+                        float value = (float)add.GetValue(x / noiseDivider, y / noiseDivider, z / noiseDivider);
+                        
+                        if (value >= minThreshold && value <= maxThreshold)
+                        {
+                            data[x, y, z] = 1;
+                        }
                     }
                 }
             }
@@ -404,5 +418,7 @@ public class CaveGen : MonoBehaviour
         vertexCount = 0;
         index = 0;
         faceCount = 0;
+
+        Debug.Log("Loaded in " + (Time.realtimeSinceStartup - startTime) + " Seconds.");
     }
 }

@@ -155,9 +155,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46a64b79e0328664ab630e683a27d354, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapSizeX: 60
-  mapSizeY: 60
-  mapSizeZ: 60
+  mapSizeX: 50
+  mapSizeY: 50
+  mapSizeZ: 50
   material: {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
   frequency: 1
   lacunarity: 2.375
@@ -168,7 +168,7 @@ MonoBehaviour:
   noiseDivider: 15
   maxThreshold: 0.5
   minThreshold: -0.5
-  swapData: 0
+  swapData: 1
 --- !u!4 &114025011
 Transform:
   m_ObjectHideFlags: 0
@@ -527,7 +527,7 @@ MonoBehaviour:
   persistence: 0.5
   octaves: 3
   seed: 0
-  segmentCount: 10
+  segmentCount: 20
   segmentLength: 1
   thickness: 1
   lateralSpeed: 2
