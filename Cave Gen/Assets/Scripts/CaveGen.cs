@@ -38,7 +38,6 @@ public class CaveGen : MonoBehaviour
     public bool distance = false;
 
     [Header("Noise Values")]
-    public float noiseScale = 0.05f;
     public float noiseDivider = 15.0f;
     public float maxThreshold = 0.5f;
     public float minThreshold = -0.5f;
@@ -47,7 +46,6 @@ public class CaveGen : MonoBehaviour
     ModuleBase rigged;
     ModuleBase voronoi;
     ModuleBase add;
-    Vector3 noisePos;
 
     // Mesh Stuff
     private List<MeshData> meshData = new List<MeshData>();
@@ -58,7 +56,6 @@ public class CaveGen : MonoBehaviour
 
     private float tUnit = 0.25f;
     private Vector2 tStone = new Vector2(1, 0);
-    private Vector2 tGrass = new Vector2(0, 1);
 
     private int faceCount;
 
@@ -250,14 +247,11 @@ public class CaveGen : MonoBehaviour
             {
                 for (int x = 0; x < mapSizeX; x++)
                 {
-                    if (x > 0 && x < mapSizeX - 1 && y > 0 && y < mapSizeY - 1 && z > 0 && z < mapSizeZ - 1)
-                    {
-                        // If block is air
-                        if (Block(x, y, z) == 0)
-                            data[x, y, z] = 1;
-                        else
-                            data[x, y, z] = 0;
-                    }
+                    // If block is air
+                    if (Block(x, y, z) == 0)
+                        data[x, y, z] = 1;
+                    else
+                        data[x, y, z] = 0;
                 }
             }
         }
@@ -291,18 +285,14 @@ public class CaveGen : MonoBehaviour
 
                     float value = (float)add.GetValue(x / noiseDivider, y / noiseDivider, z / noiseDivider);
 
-                    if (value >= minThreshold && value <= maxThreshold)
+                    if (value >= minThreshold && value <= maxThreshold || y == 0)
                     {
                         data[x, y, z] = 1;
-                    }
-
-                    if (x > 0 && x < mapSizeX - 1 && y > 0 && y < mapSizeY - 1 && z > 0 && z < mapSizeZ - 1)
-                    {
-                        
                     }
                 }
             }
         }
+
         CreateMesh();
     }
 
