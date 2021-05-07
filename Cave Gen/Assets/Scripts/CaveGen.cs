@@ -244,21 +244,6 @@ public class CaveGen : MonoBehaviour
     {
         startTime = Time.realtimeSinceStartup;
 
-        //for (int y = 0; y < mapSizeY; y++)
-        //{
-        //    for (int z = 0; z < mapSizeZ; z++)
-        //    {
-        //        for (int x = 0; x < mapSizeX; x++)
-        //        {
-        //            // If block is air
-        //            if (Block(x, y, z) == 0)
-        //                data[x, y, z] = 1;
-        //            else
-        //                data[x, y, z] = 0;
-        //        }
-        //    }
-        //}
-
         if (swapData)
             swapData = false;
         else
@@ -279,7 +264,7 @@ public class CaveGen : MonoBehaviour
         //voronoi = new Voronoi(frequency, displacement, seed, distance);
         //billow = new Billow(frequency, lacunarity, persistence, octaves, seed, QualityMode.High);
         //cylinders = new Cylinders(frequency);
-        //spheres = new Spheres(0);
+        //spheres = new Spheres(frequency);
 
         //add = new Add(rigged, perlin);
         //add = new Blend(spheres, perlin, billow);
