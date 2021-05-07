@@ -44,7 +44,10 @@ public class CaveGen : MonoBehaviour
 
     ModuleBase perlin;
     ModuleBase rigged;
+    ModuleBase billow;
     ModuleBase voronoi;
+    ModuleBase cylinders;
+    ModuleBase spheres;
     ModuleBase add;
 
     // Mesh Stuff
@@ -241,20 +244,20 @@ public class CaveGen : MonoBehaviour
     {
         startTime = Time.realtimeSinceStartup;
 
-        for (int y = 0; y < mapSizeY; y++)
-        {
-            for (int z = 0; z < mapSizeZ; z++)
-            {
-                for (int x = 0; x < mapSizeX; x++)
-                {
-                    // If block is air
-                    if (Block(x, y, z) == 0)
-                        data[x, y, z] = 1;
-                    else
-                        data[x, y, z] = 0;
-                }
-            }
-        }
+        //for (int y = 0; y < mapSizeY; y++)
+        //{
+        //    for (int z = 0; z < mapSizeZ; z++)
+        //    {
+        //        for (int x = 0; x < mapSizeX; x++)
+        //        {
+        //            // If block is air
+        //            if (Block(x, y, z) == 0)
+        //                data[x, y, z] = 1;
+        //            else
+        //                data[x, y, z] = 0;
+        //        }
+        //    }
+        //}
 
         if (swapData)
             swapData = false;
@@ -271,18 +274,24 @@ public class CaveGen : MonoBehaviour
     {
         startTime = Time.realtimeSinceStartup;
 
+        perlin = new Perlin(frequency, lacunarity, persistence, octaves, seed, QualityMode.High);
+        rigged = new RiggedMultifractal(frequency, lacunarity, octaves, seed, QualityMode.High);
+        //voronoi = new Voronoi(frequency, displacement, seed, distance);
+        //billow = new Billow(frequency, lacunarity, persistence, octaves, seed, QualityMode.High);
+        //cylinders = new Cylinders(frequency);
+        //spheres = new Spheres(0);
+
+        //add = new Add(rigged, perlin);
+        //add = new Blend(spheres, perlin, billow);
+        add = new Multiply(rigged, perlin);
+
+
         for (int y = 0; y < mapSizeY; y++)
         {
             for (int z = 0; z < mapSizeZ; z++)
             {
                 for (int x = 0; x < mapSizeX; x++)
                 {
-                    perlin = new Perlin(frequency, lacunarity, persistence, octaves, seed, QualityMode.High);
-                    rigged = new RiggedMultifractal(frequency, lacunarity, octaves, seed, QualityMode.High);
-                    voronoi = new Voronoi(frequency, displacement, seed, distance);
-
-                    add = new Add(perlin, rigged);
-
                     float value = (float)add.GetValue(x / noiseDivider, y / noiseDivider, z / noiseDivider);
 
                     if (value >= minThreshold && value <= maxThreshold || y == 0)
@@ -292,7 +301,7 @@ public class CaveGen : MonoBehaviour
                 }
             }
         }
-
+        Debug.Log("Generated in " + (Time.realtimeSinceStartup - startTime) + " Seconds.");
         CreateMesh();
     }
 
@@ -301,49 +310,56 @@ public class CaveGen : MonoBehaviour
     {
         meshData.Add(new MeshData());
 
+        byte block;
+
+        if (swapData)
+            block = 1;
+        else
+            block = 0;
+
         for (int x = 0; x < mapSizeX; x++)
         {
             for (int y = 0; y < mapSizeY; y++)
             {
                 for (int z = 0; z < mapSizeZ; z++)
                 {
-                    // If block is solid
-                    if (Block(x, y, z) != 0)
+                    // If block is solid(1)/air(0)
+                    if (Block(x, y, z) != block)
                     {
-                        if (Block(x, y + 1, z) == 0 || y == mapSizeY - 1)
+                        if (Block(x, y + 1, z) == block || y == mapSizeY - 1)
                         {
                             // Block above is air
                             CubeTop(x, y, z, Block(x, y, z));
                         }
 
-                        if (Block(x, y - 1, z) == 0 || y == 0)
+                        if (Block(x, y - 1, z) == block || y == 0)
                         {
                             //Block below is air
                             CubeBottom(x, y, z, Block(x, y, z));
                         }
 
-                        if (Block(x + 1, y, z) == 0 || x == mapSizeX - 1)
+                        if (Block(x + 1, y, z) == block || x == mapSizeX - 1)
                         {
                             //Block east is air
                             CubeEast(x, y, z, Block(x, y, z));
 
                         }
 
-                        if (Block(x - 1, y, z) == 0 || x == 0)
+                        if (Block(x - 1, y, z) == block || x == 0)
                         {
                             //Block west is air
                             CubeWest(x, y, z, Block(x, y, z));
 
                         }
 
-                        if (Block(x, y, z + 1) == 0 || z == mapSizeZ - 1)
+                        if (Block(x, y, z + 1) == block || z == mapSizeZ - 1)
                         {
                             //Block north is air
                             CubeNorth(x, y, z, Block(x, y, z));
 
                         }
 
-                        if (Block(x, y, z - 1) == 0 || z == 0)
+                        if (Block(x, y, z - 1) == block || z == 0)
                         {
                             //Block south is air
                             CubeSouth(x, y, z, Block(x, y, z));
@@ -352,7 +368,7 @@ public class CaveGen : MonoBehaviour
                 }
             }
         }
-
+        Debug.Log("Mesh Created in " + (Time.realtimeSinceStartup - startTime) + " Seconds.");
         UpdateMesh();
     }
 
