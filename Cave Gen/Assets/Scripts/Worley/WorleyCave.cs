@@ -2,22 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WorleyCave : MonoBehaviour
+public class WorleyCave
 {
     const int HAS_CAVES_FLAG = 129;
 
     public int seed = 0;
     //public float frequency = 0.05f;
 
-    public int minCaveHeight = 0;
-    public int maxCaveHeight = 100;
+    public int minCaveHeight = 1;
+    public int maxCaveHeight = 128;
 
-    public float noiseCutoff;
-    public float warpAmplifier = 1.0f;
-    private float easeInDepth;
-    private float surfaceCutoff;
-    public float yCompression;
-    public float xzCompression;
+    [Range(-1.0f, 1.0f)] public float noiseCutoff = -0.18f; //Controls size of caves. Smaller values = larger caves
+    [Range(-1.0f, 1.0f)] public float warpAmplifier = 1.0f; //Controls how much to warp caves. Lower values = straighter caves
+
+    public float surfaceCutoff = -0.081f;           //Controls size of caves at the surface. Smaller values = more caves break through the surface
+    public float easeInDepth = 15.0f;               //Reduces number of caves at surface level, becoming more common until caves generate normally X number of blocks below the surface
+    public float yCompression = 2.0f;               //Squishes caves on the Y axis. Lower values = taller caves and more steep drops
+    public float xzCompression = 8.0f;              //Controls how much to warp caves. Lower values = straighter caves
 
 
     private WorleyUtil util;
@@ -36,13 +37,13 @@ public class WorleyCave : MonoBehaviour
         CarveWorleyCaves(0, 0);
     }
 
-    void CarveWorleyCaves(int chunkX, int chunkZ)
+    public void CarveWorleyCaves(int chunkX, int chunkZ)
     {
         int chunkMaxHeight = maxCaveHeight;
         float[,,] samples = SampleNoise(chunkX, chunkZ, chunkMaxHeight + 1);
         float oneQuarter = 0.25f;
         float oneHalf = 0.5f;
-        byte block;
+        byte block = 2; // 2 = null
         Vector3 localPos;
         Vector3 realPos;
 
@@ -148,13 +149,34 @@ public class WorleyCave : MonoBehaviour
                                 if (noiseVal > adjustedNoiseCutoff)
                                 {
                                     byte aboveBlock = script.data[localX, localY + 1, localZ];
+
+                                    if (block == 2)
+                                        block = script.data[x, y, z];
+
+                                    DigBlock(localPos, block);
                                 }
+
+                                noiseVal += noiseStepZ;
                             }
+
+                            noiseStartZ += noiseStepX0;
+                            noiseEndZ += noiseStepX1;
                         }
+
+                        noiseStartX0 += noiseStepY00;
+                        noiseStartX1 += noiseStepY01;
+                        noiseEndX0 += noiseStepY10;
+                        noiseEndX1 += noiseStepY11;
                     }
                 }
             }
         }
+    }
+
+    void DigBlock(Vector3 blockPos, byte block)
+    {
+        if (block == 1)
+            script.data[(int)blockPos.x, (int)blockPos.y, (int)blockPos.z] = 0;
     }
 
     float[,,] SampleNoise(int chunkX, int chunkZ, int maxSurfaceHeight)
