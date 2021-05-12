@@ -14,6 +14,8 @@ public class WorleyCave : MonoBehaviour
 
     public float noiseCutoff;
     public float warpAmplifier = 1.0f;
+    private float easeInDepth;
+    private float surfaceCutoff;
     public float yCompression;
     public float xzCompression;
 
@@ -21,6 +23,7 @@ public class WorleyCave : MonoBehaviour
     private WorleyUtil util;
     private FastNoise noisePerlin;
 
+    private CaveGen script;
 
     void Setup()
     {
@@ -39,6 +42,7 @@ public class WorleyCave : MonoBehaviour
         float[,,] samples = SampleNoise(chunkX, chunkZ, chunkMaxHeight + 1);
         float oneQuarter = 0.25f;
         float oneHalf = 0.5f;
+        byte block;
         Vector3 localPos;
         Vector3 realPos;
 
@@ -104,6 +108,47 @@ public class WorleyCave : MonoBehaviour
                             for (int subz = 0; subz < 4; subz++)
                             {
                                 int localZ = subz + z + 4;
+                                localPos = new Vector3(localX, localY, localZ);
+                                realPos = new Vector3(chunkX * 16 + localX, localY, chunkZ * 16 + localZ);
+
+                                if (depth == 0)
+                                {
+                                    if (subx == 0 && subz == 0)
+                                    {
+                                        block = script.data[x, y, z];
+
+                                        // If block is solid???
+                                        if (block == 1)
+                                            depth++;
+                                    }
+                                    else
+                                    {
+                                        continue;
+                                    }
+                                }
+                                else if (subx == 0 && subz == 0)
+                                {
+                                    // already hit surface, simply increment depth counter
+                                    depth++;
+                                }
+
+                                float adjustedNoiseCutoff = noiseCutoff;
+                                if (depth < easeInDepth)
+                                {
+                                    // higher threshold at surface, normal threshold below easeInDepth
+                                    adjustedNoiseCutoff = Mathf.Lerp(noiseCutoff, surfaceCutoff, (easeInDepth - (float)depth / easeInDepth));
+                                }
+
+                                // increase cutoff as we get closer to the minCaveHeight so it's not all flat floors
+                                if (localY < (minCaveHeight + 5))
+                                {
+                                    adjustedNoiseCutoff += ((minCaveHeight + 5) - localY) * 0.05f;
+                                }
+
+                                if (noiseVal > adjustedNoiseCutoff)
+                                {
+                                    byte aboveBlock = script.data[localX, localY + 1, localZ];
+                                }
                             }
                         }
                     }
