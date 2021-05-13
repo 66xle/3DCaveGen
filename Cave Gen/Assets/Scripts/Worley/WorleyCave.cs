@@ -12,13 +12,13 @@ public class WorleyCave : MonoBehaviour
     public int minCaveHeight = 1;
     public int maxCaveHeight = 128;
 
-    [Range(-1.0f, 1.0f)] public float noiseCutoff = -0.18f; //Controls size of caves. Smaller values = larger caves
-    [Range(-1.0f, 1.0f)] public float warpAmplifier = 1.0f; //Controls how much to warp caves. Lower values = straighter caves
+    [Range(-1.0f, 1.0f)] public float noiseCutoff = -0.18f;     //Controls size of caves. Smaller values = larger caves
+    [Range(-1.0f, 1.0f)] public float surfaceCutoff = -0.081f;  //Controls size of caves at the surface. Smaller values = more caves break through the surface
 
-    public float surfaceCutoff = -0.081f;           //Controls size of caves at the surface. Smaller values = more caves break through the surface
+    public float warpAmplifier = 8.0f;              //Controls how much to warp caves. Lower values = straighter caves
     public float easeInDepth = 15.0f;               //Reduces number of caves at surface level, becoming more common until caves generate normally X number of blocks below the surface
     public float yCompression = 2.0f;               //Squishes caves on the Y axis. Lower values = taller caves and more steep drops
-    public float xzCompression = 8.0f;              //Controls how much to warp caves. Lower values = straighter caves
+    public float xzCompression = 1.0f;              //Controls how much to warp caves. Lower values = straighter caves
 
 
     private WorleyUtil util;
@@ -35,20 +35,19 @@ public class WorleyCave : MonoBehaviour
 
         noisePerlin = new FastNoise(seed);
         noisePerlin.SetFrequency(0.05f);
-
-        CarveWorleyCaves(0, 0);
     }
 
     public void CarveWorleyCaves(int chunkX, int chunkZ)
     {
-        int chunkMaxHeight = maxCaveHeight;
+        int chunkMaxHeight = script.mapSizeY;
         float[,,] samples = SampleNoise(chunkX, chunkZ, chunkMaxHeight + 1);
         float oneQuarter = 0.25f;
         float oneHalf = 0.5f;
         byte block = 2; // 2 = null
         Vector3 localPos;
-        Vector3 realPos;
 
+        int offsetX = chunkX * 16;
+        int offsetZ = chunkZ * 16;
 
         // each chunk divided into 4 subchunks along X axis
         for (int x = 0; x < 4; x++)
@@ -110,15 +109,15 @@ public class WorleyCave : MonoBehaviour
 
                             for (int subz = 0; subz < 4; subz++)
                             {
-                                int localZ = subz + z + 4;
-                                localPos = new Vector3(localX, localY, localZ);
-                                realPos = new Vector3(chunkX * 16 + localX, localY, chunkZ * 16 + localZ);
+                                int localZ = subz + z * 4;
+                                block = 2; // Null
+                                localPos = new Vector3(localX + offsetX, localY, localZ + offsetZ);
 
                                 if (depth == 0)
                                 {
                                     if (subx == 0 && subz == 0)
                                     {
-                                        block = script.data[x, y, z];
+                                        block = script.data[(int)localPos.x, (int)localPos.y, (int)localPos.z];
 
                                         // If block is solid???
                                         if (block == 1)
@@ -150,10 +149,8 @@ public class WorleyCave : MonoBehaviour
 
                                 if (noiseVal > adjustedNoiseCutoff)
                                 {
-                                    //byte aboveBlock = script.data[localX, localY + 1, localZ];
-
                                     if (block == 2)
-                                        block = script.data[x, y, z];
+                                        block = script.data[(int)localPos.x, (int)localPos.y, (int)localPos.z];
 
                                     DigBlock(localPos, block);
                                 }

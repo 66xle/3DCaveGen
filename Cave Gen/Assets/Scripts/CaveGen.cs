@@ -73,6 +73,7 @@ public class CaveGen : MonoBehaviour
     void Start()
     {
         worley = GetComponent<WorleyCave>();
+        worley.Setup();
 
         data = new byte[mapSizeX, mapSizeY, mapSizeZ];
 
@@ -294,7 +295,11 @@ public class CaveGen : MonoBehaviour
         }
         Debug.Log("Generated in " + (Time.realtimeSinceStartup - startTime) + " Seconds.");
 
-        worley.Setup();
+        
+        worley.CarveWorleyCaves(0, 0);
+        worley.CarveWorleyCaves(1, 1);
+        worley.CarveWorleyCaves(0, 1);
+        worley.CarveWorleyCaves(1, 0);
         CreateMesh();
     }
 
