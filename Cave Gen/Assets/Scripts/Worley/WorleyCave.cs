@@ -11,17 +11,14 @@ public class WorleyCave : MonoBehaviour
 
     public int minCaveHeight = 1;
     public int maxCaveHeight = 128;
-    [Tooltip("Controls size of caves. Smaller values = larger caves")] [Range(-1.0f, 1.0f)] public float noiseCutoff = -0.18f;
-    [Tooltip("Controls size of caves at the surface. Smaller values = more caves break through the surface")] [Range(-1.0f, 1.0f)] public float surfaceCutoff = -0.081f;
+    [Tooltip("Controls size of caves. Smaller values = larger caves (-1 to 1)")] public float noiseCutoff = -0.18f;
+    [Tooltip("Controls size of caves at the surface. Smaller values = more caves break through the surface (-1 to 1)")] public float surfaceCutoff = -0.081f;
 
-    [Tooltip("Controls how much to warp caves. Lower values = straighter caves")]
-    public float warpAmplifier = 8.0f;
-    [Tooltip("Reduces number of caves at surface level, becoming more common until caves generate normally X number of blocks below the surface")] 
-    public float easeInDepth = 15.0f;
-    [Tooltip("Squishes caves on the Y axis. Lower values = taller caves and more steep drops")] 
-    public float yCompression = 2.0f;
-    [Tooltip("Controls how much to warp caves. Lower values = straighter caves")] 
-    public float xzCompression = 1.0f;
+    [Tooltip("Controls how much to warp caves. Lower values = straighter caves")] public float warpAmplifier = 8.0f;
+    [Tooltip("Reduces number of caves at surface level, becoming more common until caves generate normally X number of blocks below the surface")] public float easeInDepth = 15.0f;
+    [Tooltip("Squishes caves on the Y axis. Lower values = taller caves and more steep drops")] public float yCompression = 2.0f;
+    [Tooltip("Controls how much to warp caves. Lower values = straighter caves")] public float xzCompression = 1.0f;
+
 
 
     private WorleyUtil util;

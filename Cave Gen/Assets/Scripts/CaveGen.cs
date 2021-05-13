@@ -78,6 +78,11 @@ public class CaveGen : MonoBehaviour
 
     void Update()
     {
+        foreach (GameObject go in chunkList)
+        {
+            CaveData data = go.GetComponent<CaveData>();
+            Debug.DrawLine(data.midPosition, new Vector3(data.midPosition.x, maxHeight + 20.0f, data.midPosition.z), Color.red);
+        }
 
         if (Input.GetKeyDown(KeyCode.G))
         {
