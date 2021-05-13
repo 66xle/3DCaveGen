@@ -39,7 +39,7 @@ public class WorleyCave : MonoBehaviour
 
     public void CarveWorleyCaves(int chunkX, int chunkZ)
     {
-        int chunkMaxHeight = script.mapSizeY;
+        int chunkMaxHeight = script.maxHeight;
         float[,,] samples = SampleNoise(chunkX, chunkZ, chunkMaxHeight + 1);
         float oneQuarter = 0.25f;
         float oneHalf = 0.5f;

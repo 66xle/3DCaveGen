@@ -105,64 +105,64 @@ public class Worm : MonoBehaviour
 
     void MoveWorm()
     {
-        Vector3 originOffSet = new Vector3(script.mapSizeX / 2, script.mapSizeY / 2, script.mapSizeZ / 2);
+        //Vector3 originOffSet = new Vector3(script.mapSizeX / 2, script.mapSizeY / 2, script.mapSizeZ / 2);
 
-        curSegmentScreenPos = (headScreenPos * 100.0f) + originOffSet;
-        Vector3 offsetPos;
-        Vector3 curNoisePos;
+        //curSegmentScreenPos = (headScreenPos * 100.0f) + originOffSet;
+        //Vector3 offsetPos;
+        //Vector3 curNoisePos;
 
-        curSegmentScreenPos.x = Mathf.Clamp(curSegmentScreenPos.x, 1, script.mapSizeX - 1);
-        curSegmentScreenPos.y = Mathf.Clamp(curSegmentScreenPos.y, 1, script.mapSizeY - 1);
-        curSegmentScreenPos.z = Mathf.Clamp(curSegmentScreenPos.z, 1, script.mapSizeZ - 1);
+        //curSegmentScreenPos.x = Mathf.Clamp(curSegmentScreenPos.x, 1, script.mapSizeX - 1);
+        //curSegmentScreenPos.y = Mathf.Clamp(curSegmentScreenPos.y, 1, script.mapSizeY - 1);
+        //curSegmentScreenPos.z = Mathf.Clamp(curSegmentScreenPos.z, 1, script.mapSizeZ - 1);
 
-        wormSegments[0].transform.position = curSegmentScreenPos; // Set worm head position
-        //transform.position = curSegmentScreenPos; // Set worm holder position
+        //wormSegments[0].transform.position = curSegmentScreenPos; // Set worm head position
+        ////transform.position = curSegmentScreenPos; // Set worm holder position
 
-        for (int curSegment = 1; curSegment < segmentCount; curSegment++)
-        {
-            // Noise Stuff
-            curNoisePos.x = headNoisePos.x + (curSegment * 2 * TWISTNESS);
-            curNoisePos.y = headNoisePos.y;
-            curNoisePos.z = headNoisePos.z;
-            float noiseValueA = (float)module.GetValue(curNoisePos.x, curNoisePos.y, curNoisePos.z) * 2.0f * Mathf.PI;
-            float noiseValueB = (float)module2.GetValue(curNoisePos.x, curNoisePos.y, curNoisePos.z) * 2.0f * Mathf.PI;
+        //for (int curSegment = 1; curSegment < segmentCount; curSegment++)
+        //{
+        //    // Noise Stuff
+        //    curNoisePos.x = headNoisePos.x + (curSegment * 2 * TWISTNESS);
+        //    curNoisePos.y = headNoisePos.y;
+        //    curNoisePos.z = headNoisePos.z;
+        //    float noiseValueA = (float)module.GetValue(curNoisePos.x, curNoisePos.y, curNoisePos.z) * 2.0f * Mathf.PI;
+        //    float noiseValueB = (float)module2.GetValue(curNoisePos.x, curNoisePos.y, curNoisePos.z) * 2.0f * Mathf.PI;
 
-            // Offsetting Segment
-            offsetPos.x = Mathf.Cos(noiseValueA) * Mathf.Sin(noiseValueB);
-            offsetPos.y = Mathf.Sin(noiseValueA) * Mathf.Sin(noiseValueB);
-            offsetPos.z = Mathf.Cos(noiseValueB);
+        //    // Offsetting Segment
+        //    offsetPos.x = Mathf.Cos(noiseValueA) * Mathf.Sin(noiseValueB);
+        //    offsetPos.y = Mathf.Sin(noiseValueA) * Mathf.Sin(noiseValueB);
+        //    offsetPos.z = Mathf.Cos(noiseValueB);
 
-            Vector3 currentPos = curSegmentScreenPos + offsetPos;
+        //    Vector3 currentPos = curSegmentScreenPos + offsetPos;
 
-            wormSegments[curSegment].transform.position = currentPos;
+        //    wormSegments[curSegment].transform.position = currentPos;
 
-            curSegmentScreenPos += offsetPos;
+        //    curSegmentScreenPos += offsetPos;
 
-            CarveCave(curSegmentScreenPos, wormSegments[curSegment - 1].transform.position);
-        }
+        //    CarveCave(curSegmentScreenPos, wormSegments[curSegment - 1].transform.position);
+        //}
     }
 
     void CarveCave(Vector3 position, Vector3 previousPosition)
     {
-        Debug.DrawLine(position, previousPosition, Color.blue);
+        //Debug.DrawLine(position, previousPosition, Color.blue);
 
-        byte block;
+        //byte block;
 
-        if (script.swapData)
-            block = 1; // Solid
-        else
-            block = 0; // Air
+        //if (script.swapData)
+        //    block = 1; // Solid
+        //else
+        //    block = 0; // Air
 
-        int x = Mathf.Clamp(Mathf.RoundToInt(position.x), 1, script.mapSizeX - 2);
-        int y = Mathf.Clamp(Mathf.RoundToInt(position.y), 1, script.mapSizeY - 2);
-        int z = Mathf.Clamp(Mathf.RoundToInt(position.z), 1, script.mapSizeZ - 2);
+        //int x = Mathf.Clamp(Mathf.RoundToInt(position.x), 1, script.mapSizeX - 2);
+        //int y = Mathf.Clamp(Mathf.RoundToInt(position.y), 1, script.mapSizeY - 2);
+        //int z = Mathf.Clamp(Mathf.RoundToInt(position.z), 1, script.mapSizeZ - 2);
 
-        if (script.Block(x, y, z) != block)
-        {
-            script.data[x, y, z] = block;
+        //if (script.Block(x, y, z) != block)
+        //{
+        //    script.data[x, y, z] = block;
             
-            script.CreateMesh();
+        //    script.CreateMesh();
             
-        }
+        //}
     }
 }

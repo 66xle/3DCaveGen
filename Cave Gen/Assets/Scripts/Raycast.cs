@@ -32,7 +32,7 @@ public class Raycast : MonoBehaviour
 
             script.data[Mathf.RoundToInt(point.x - 0.5f), Mathf.RoundToInt(point.y + 0.5f), Mathf.RoundToInt(point.z - 0.5f)] = 0;
 
-            script.CreateMesh();
+            //script.CreateMesh();
 
         }
         else

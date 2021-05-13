@@ -22,10 +22,14 @@ public class CaveGen : MonoBehaviour
 
     [Header("Cave Values")]
     public byte[,,] data;
-    public int mapSizeX = 10;
-    public int mapSizeY = 10;
-    public int mapSizeZ = 10;
+    public int maxHeight = 10;
+    public int chunkSizeX;
+    public int chunkSizeZ;
     public Material material;
+
+    private int mapSizeX;
+    private int mapSizeY;
+    private int mapSizeZ;
 
     [Header("Perlin Values")]
     public double frequency = 1.0;
@@ -75,6 +79,10 @@ public class CaveGen : MonoBehaviour
         worley = GetComponent<WorleyCave>();
         worley.Setup();
 
+        mapSizeX = chunkSizeX * 16;
+        mapSizeZ = chunkSizeZ * 16;
+        mapSizeY = maxHeight;
+
         data = new byte[mapSizeX, mapSizeY, mapSizeZ];
 
         Generate();
@@ -88,6 +96,10 @@ public class CaveGen : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.G))
         {
             updateMesh = false;
+
+            mapSizeX = chunkSizeX * 16;
+            mapSizeZ = chunkSizeZ * 16;
+            mapSizeY = maxHeight;
 
             data = new byte[mapSizeX, mapSizeY, mapSizeZ];
 
@@ -256,8 +268,8 @@ public class CaveGen : MonoBehaviour
 
         updateMesh = false;
 
-        DestoryMesh();
-        CreateMesh();
+        //DestoryMesh();
+        //CreateMesh();
     }
 
     void Generate()
@@ -293,18 +305,24 @@ public class CaveGen : MonoBehaviour
                 }
             }
         }
-        Debug.Log("Generated in " + (Time.realtimeSinceStartup - startTime) + " Seconds.");
 
         
-        worley.CarveWorleyCaves(0, 0);
-        worley.CarveWorleyCaves(1, 1);
-        worley.CarveWorleyCaves(0, 1);
-        worley.CarveWorleyCaves(1, 0);
-        CreateMesh();
+        for (int x = 0; x < chunkSizeX; x++)
+        {
+            for (int z = 0; z < chunkSizeZ; z++)
+            {
+                worley.CarveWorleyCaves(x, z);
+                CreateMesh(x, z);
+            }
+        }
+
+        updateMesh = true;
+
+        Debug.Log("Loaded in " + (Time.realtimeSinceStartup - startTime) + " Seconds.");
     }
 
     // Add Verts, Triangles and UVs to mesh
-    public void CreateMesh()
+    public void CreateMesh(int chunkX, int chunkZ)
     {
         meshData.Add(new MeshData());
 
@@ -315,11 +333,11 @@ public class CaveGen : MonoBehaviour
         else
             block = 0;
 
-        for (int x = 0; x < mapSizeX; x++)
+        for (int x = chunkX * 16; x < chunkX * 16 + 16; x++)
         {
             for (int y = 0; y < mapSizeY; y++)
             {
-                for (int z = 0; z < mapSizeZ; z++)
+                for (int z = chunkZ * 16; z < chunkZ * 16 + 16; z++)
                 {
                     // If block is solid(1)/air(0)
                     if (Block(x, y, z) != block)
@@ -366,7 +384,6 @@ public class CaveGen : MonoBehaviour
                 }
             }
         }
-        Debug.Log("Mesh Created in " + (Time.realtimeSinceStartup - startTime) + " Seconds.");
         UpdateMesh();
     }
 
@@ -405,14 +422,10 @@ public class CaveGen : MonoBehaviour
             mesh.RecalculateNormals();
         }
 
-        updateMesh = true;
-
         meshData.Clear();
 
         vertexCount = 0;
         index = 0;
         faceCount = 0;
-
-        Debug.Log("Loaded in " + (Time.realtimeSinceStartup - startTime) + " Seconds.");
     }
 }
