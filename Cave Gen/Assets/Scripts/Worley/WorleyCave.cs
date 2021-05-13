@@ -11,19 +11,21 @@ public class WorleyCave : MonoBehaviour
 
     public int minCaveHeight = 1;
     public int maxCaveHeight = 128;
+    [Tooltip("Controls size of caves. Smaller values = larger caves")] [Range(-1.0f, 1.0f)] public float noiseCutoff = -0.18f;
+    [Tooltip("Controls size of caves at the surface. Smaller values = more caves break through the surface")] [Range(-1.0f, 1.0f)] public float surfaceCutoff = -0.081f;
 
-    [Range(-1.0f, 1.0f)] public float noiseCutoff = -0.18f;     //Controls size of caves. Smaller values = larger caves
-    [Range(-1.0f, 1.0f)] public float surfaceCutoff = -0.081f;  //Controls size of caves at the surface. Smaller values = more caves break through the surface
-
-    public float warpAmplifier = 8.0f;              //Controls how much to warp caves. Lower values = straighter caves
-    public float easeInDepth = 15.0f;               //Reduces number of caves at surface level, becoming more common until caves generate normally X number of blocks below the surface
-    public float yCompression = 2.0f;               //Squishes caves on the Y axis. Lower values = taller caves and more steep drops
-    public float xzCompression = 1.0f;              //Controls how much to warp caves. Lower values = straighter caves
+    [Tooltip("Controls how much to warp caves. Lower values = straighter caves")]
+    public float warpAmplifier = 8.0f;
+    [Tooltip("Reduces number of caves at surface level, becoming more common until caves generate normally X number of blocks below the surface")] 
+    public float easeInDepth = 15.0f;
+    [Tooltip("Squishes caves on the Y axis. Lower values = taller caves and more steep drops")] 
+    public float yCompression = 2.0f;
+    [Tooltip("Controls how much to warp caves. Lower values = straighter caves")] 
+    public float xzCompression = 1.0f;
 
 
     private WorleyUtil util;
     private FastNoise noisePerlin;
-
     private CaveGen script;
 
     public void Setup()
@@ -174,8 +176,16 @@ public class WorleyCave : MonoBehaviour
 
     void DigBlock(Vector3 blockPos, byte block)
     {
+        byte b;
+
+        if (script.swapData)
+            b = 1;
+        else
+            b = 0;
+
+
         if (block == 1)
-            script.data[(int)blockPos.x, (int)blockPos.y, (int)blockPos.z] = 0;
+            script.data[(int)blockPos.x, (int)blockPos.y, (int)blockPos.z] = b;
     }
 
     float[,,] SampleNoise(int chunkX, int chunkZ, int maxSurfaceHeight)

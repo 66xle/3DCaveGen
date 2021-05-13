@@ -268,8 +268,10 @@ public class CaveGen : MonoBehaviour
 
         updateMesh = false;
 
-        //DestoryMesh();
-        //CreateMesh();
+        DestoryMesh();
+        CreateMesh(0, 0, mapSizeX, mapSizeZ);
+
+        updateMesh = true;
     }
 
     void Generate()
@@ -287,7 +289,7 @@ public class CaveGen : MonoBehaviour
         //add = new Blend(spheres, perlin, billow);
         //add = new Multiply(rigged, perlin);
 
-
+        // Fill map with solid blocks
         for (int y = 0; y < mapSizeY; y++)
         {
             for (int z = 0; z < mapSizeZ; z++)
@@ -312,7 +314,7 @@ public class CaveGen : MonoBehaviour
             for (int z = 0; z < chunkSizeZ; z++)
             {
                 worley.CarveWorleyCaves(x, z);
-                CreateMesh(x, z);
+                CreateMesh(x * 16, z * 16, x * 16 + 16, z * 16 + 16);
             }
         }
 
@@ -322,7 +324,7 @@ public class CaveGen : MonoBehaviour
     }
 
     // Add Verts, Triangles and UVs to mesh
-    public void CreateMesh(int chunkX, int chunkZ)
+    public void CreateMesh(int chunkX, int chunkZ, int maxX, int maxZ)
     {
         meshData.Add(new MeshData());
 
@@ -333,11 +335,11 @@ public class CaveGen : MonoBehaviour
         else
             block = 0;
 
-        for (int x = chunkX * 16; x < chunkX * 16 + 16; x++)
+        for (int x = chunkX; x < maxX; x++)
         {
             for (int y = 0; y < mapSizeY; y++)
             {
-                for (int z = chunkZ * 16; z < chunkZ * 16 + 16; z++)
+                for (int z = chunkZ; z < maxZ; z++)
                 {
                     // If block is solid(1)/air(0)
                     if (Block(x, y, z) != block)
@@ -354,28 +356,28 @@ public class CaveGen : MonoBehaviour
                             CubeBottom(x, y, z, Block(x, y, z));
                         }
 
-                        if (Block(x + 1, y, z) == block || x == mapSizeX - 1)
+                        if (Block(x + 1, y, z) == block || x == maxX - 1)
                         {
                             //Block east is air
                             CubeEast(x, y, z, Block(x, y, z));
 
                         }
 
-                        if (Block(x - 1, y, z) == block || x == 0)
+                        if (Block(x - 1, y, z) == block || x == chunkX)
                         {
                             //Block west is air
                             CubeWest(x, y, z, Block(x, y, z));
 
                         }
 
-                        if (Block(x, y, z + 1) == block || z == mapSizeZ - 1)
+                        if (Block(x, y, z + 1) == block || z == maxZ - 1)
                         {
                             //Block north is air
                             CubeNorth(x, y, z, Block(x, y, z));
 
                         }
 
-                        if (Block(x, y, z - 1) == block || z == 0)
+                        if (Block(x, y, z - 1) == block || z == chunkZ)
                         {
                             //Block south is air
                             CubeSouth(x, y, z, Block(x, y, z));
