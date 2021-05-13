@@ -29,6 +29,8 @@ public class WorleyUtil
 		y *= frequency;
 		z *= frequency;
 
+		FASTNOISE = new FastNoise(seed);
+
 		int xr = FASTNOISE.FastFloor(x) - 1;
 		int yr = FASTNOISE.FastFloor(y) - 1;
 		int zr = FASTNOISE.FastFloor(z) - 1;

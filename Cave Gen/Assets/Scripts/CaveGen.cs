@@ -19,6 +19,7 @@ public class CaveGen : MonoBehaviour
             newUV = new List<Vector2>();
         }
     }
+
     [Header("Cave Values")]
     public byte[,,] data;
     public int mapSizeX = 10;
@@ -67,9 +68,12 @@ public class CaveGen : MonoBehaviour
     private bool updateMesh = false;
 
     private float startTime;
+    private WorleyCave worley;
 
     void Start()
     {
+        worley = GetComponent<WorleyCave>();
+
         data = new byte[mapSizeX, mapSizeY, mapSizeZ];
 
         Generate();
@@ -259,8 +263,8 @@ public class CaveGen : MonoBehaviour
     {
         startTime = Time.realtimeSinceStartup;
 
-        perlin = new Perlin(frequency, lacunarity, persistence, octaves, seed, QualityMode.High);
-        rigged = new RiggedMultifractal(frequency, lacunarity, octaves, seed, QualityMode.High);
+        //perlin = new Perlin(frequency, lacunarity, persistence, octaves, seed, QualityMode.High);
+        //rigged = new RiggedMultifractal(frequency, lacunarity, octaves, seed, QualityMode.High);
         //voronoi = new Voronoi(frequency, displacement, seed, distance);
         //billow = new Billow(frequency, lacunarity, persistence, octaves, seed, QualityMode.High);
         //cylinders = new Cylinders(frequency);
@@ -268,7 +272,7 @@ public class CaveGen : MonoBehaviour
 
         //add = new Add(rigged, perlin);
         //add = new Blend(spheres, perlin, billow);
-        add = new Multiply(rigged, perlin);
+        //add = new Multiply(rigged, perlin);
 
 
         for (int y = 0; y < mapSizeY; y++)
@@ -277,16 +281,20 @@ public class CaveGen : MonoBehaviour
             {
                 for (int x = 0; x < mapSizeX; x++)
                 {
-                    float value = (float)add.GetValue(x / noiseDivider, y / noiseDivider, z / noiseDivider);
+                    data[x, y, z] = 1;
 
-                    if (value >= minThreshold && value <= maxThreshold || y == 0)
-                    {
-                        data[x, y, z] = 1;
-                    }
+                    //float value = (float)add.GetValue(x / noiseDivider, y / noiseDivider, z / noiseDivider);
+                    //
+                    //if (value >= minThreshold && value <= maxThreshold || y == 0)
+                    //{
+                    //    data[x, y, z] = 1;
+                    //}
                 }
             }
         }
         Debug.Log("Generated in " + (Time.realtimeSinceStartup - startTime) + " Seconds.");
+
+        worley.Setup();
         CreateMesh();
     }
 

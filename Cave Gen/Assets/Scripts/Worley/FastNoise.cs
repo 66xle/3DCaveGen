@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FastNoise
+public class FastNoise : MonoBehaviour
 {
     private int seed;
     private float frequency = 0.01f;

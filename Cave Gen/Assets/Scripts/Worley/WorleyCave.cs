@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WorleyCave
+public class WorleyCave : MonoBehaviour
 {
     const int HAS_CAVES_FLAG = 129;
 
@@ -26,8 +26,10 @@ public class WorleyCave
 
     private CaveGen script;
 
-    void Setup()
+    public void Setup()
     {
+        script = GetComponent<CaveGen>();
+
         util = new WorleyUtil(seed);
         util.SetFrequency(0.016f);
 
@@ -148,7 +150,7 @@ public class WorleyCave
 
                                 if (noiseVal > adjustedNoiseCutoff)
                                 {
-                                    byte aboveBlock = script.data[localX, localY + 1, localZ];
+                                    //byte aboveBlock = script.data[localX, localY + 1, localZ];
 
                                     if (block == 2)
                                         block = script.data[x, y, z];
