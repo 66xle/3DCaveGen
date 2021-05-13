@@ -21,43 +21,38 @@ public class CaveGen : MonoBehaviour
     }
 
     [Header("Cave Values")]
-    public byte[,,] data;
+    public byte[,,] chunkData;
     public int maxHeight = 10;
-    public int chunkSizeX;
-    public int chunkSizeZ;
+    public int chunkDistance;
     public Material material;
 
-    private int mapSizeX;
-    private int mapSizeY;
-    private int mapSizeZ;
+    //[Header("Perlin Values")]
+    //public double frequency = 1.0;
+    //public double lacunarity = 2.375;
+    //public double persistence = 0.5;
+    //public int octaves = 3;
+    //public int seed = 0;
+    //
+    //[Header("Voronoi Values")]
+    //public float displacement = 1;
+    //public bool distance = false;
+    //
+    //[Header("Noise Values")]
+    //public float noiseDivider = 15.0f;
+    //public float maxThreshold = 0.5f;
+    //public float minThreshold = -0.5f;
 
-    [Header("Perlin Values")]
-    public double frequency = 1.0;
-    public double lacunarity = 2.375;
-    public double persistence = 0.5;
-    public int octaves = 3;
-    public int seed = 0;
-
-    [Header("Voronoi Values")]
-    public float displacement = 1;
-    public bool distance = false;
-
-    [Header("Noise Values")]
-    public float noiseDivider = 15.0f;
-    public float maxThreshold = 0.5f;
-    public float minThreshold = -0.5f;
-
-    ModuleBase perlin;
-    ModuleBase rigged;
-    ModuleBase billow;
-    ModuleBase voronoi;
-    ModuleBase cylinders;
-    ModuleBase spheres;
-    ModuleBase add;
+    //ModuleBase perlin;
+    //ModuleBase rigged;
+    //ModuleBase billow;
+    //ModuleBase voronoi;
+    //ModuleBase cylinders;
+    //ModuleBase spheres;
+    //ModuleBase add;
 
     // Mesh Stuff
     private List<MeshData> meshData = new List<MeshData>();
-    private List<GameObject> meshObject = new List<GameObject>();
+    private List<GameObject> chunkList = new List<GameObject>();
 
     private int index = 0;
     private int vertexCount = 0;
@@ -79,12 +74,6 @@ public class CaveGen : MonoBehaviour
         worley = GetComponent<WorleyCave>();
         worley.Setup();
 
-        mapSizeX = chunkSizeX * 16;
-        mapSizeZ = chunkSizeZ * 16;
-        mapSizeY = maxHeight;
-
-        data = new byte[mapSizeX, mapSizeY, mapSizeZ];
-
         Generate();
     }
 
@@ -97,20 +86,14 @@ public class CaveGen : MonoBehaviour
         {
             updateMesh = false;
 
-            mapSizeX = chunkSizeX * 16;
-            mapSizeZ = chunkSizeZ * 16;
-            mapSizeY = maxHeight;
-
-            data = new byte[mapSizeX, mapSizeY, mapSizeZ];
-
-            DestoryMesh();
+            DestroyChunk();
             Generate();
         }
     }
 
-    void DestoryMesh()
+    void DestroyChunk()
     {
-        foreach (GameObject go in meshObject)
+        foreach (GameObject go in chunkList)
         {
             Destroy(go);
         }
@@ -118,12 +101,15 @@ public class CaveGen : MonoBehaviour
 
     public byte Block(int x, int y, int z)
     {
-        if (x >= mapSizeX || x < 0 || y >= mapSizeY || y < 0 || z >= mapSizeZ || z < 0)
+        if (x >= 16 || x < 0 || y >= maxHeight || y < 0 || z >= 16 || z < 0)
         {
-            return (byte)1;
+            if (swapData)
+                return 0;
+            else
+                return 1;
         }
 
-        return data[x, y, z];
+        return chunkData[x, y, z];
     }
 
     
@@ -268,8 +254,8 @@ public class CaveGen : MonoBehaviour
 
         updateMesh = false;
 
-        DestoryMesh();
-        CreateMesh(0, 0, mapSizeX, mapSizeZ);
+        DestroyChunk();
+        //CreateMesh();
 
         updateMesh = true;
     }
@@ -289,32 +275,26 @@ public class CaveGen : MonoBehaviour
         //add = new Blend(spheres, perlin, billow);
         //add = new Multiply(rigged, perlin);
 
-        // Fill map with solid blocks
-        for (int y = 0; y < mapSizeY; y++)
+        for (int chunkX = -chunkDistance; chunkX <= chunkDistance; chunkX++)
         {
-            for (int z = 0; z < mapSizeZ; z++)
+            for (int chunkZ = -chunkDistance; chunkZ <= chunkDistance; chunkZ++)
             {
-                for (int x = 0; x < mapSizeX; x++)
+                chunkData = new byte[16, maxHeight, 16];
+
+                // Fill chunk with solid blocks
+                for (int y = 0; y < maxHeight; y++)
                 {
-                    data[x, y, z] = 1;
-
-                    //float value = (float)add.GetValue(x / noiseDivider, y / noiseDivider, z / noiseDivider);
-                    //
-                    //if (value >= minThreshold && value <= maxThreshold || y == 0)
-                    //{
-                    //    data[x, y, z] = 1;
-                    //}
+                    for (int z = 0; z < 16; z++)
+                    {
+                        for (int x = 0; x < 16; x++)
+                        {
+                            chunkData[x, y, z] = 1;
+                        }
+                    }
                 }
-            }
-        }
 
-        
-        for (int x = 0; x < chunkSizeX; x++)
-        {
-            for (int z = 0; z < chunkSizeZ; z++)
-            {
-                worley.CarveWorleyCaves(x, z);
-                CreateMesh(x * 16, z * 16, x * 16 + 16, z * 16 + 16);
+                worley.CarveWorleyCaves(chunkX, chunkZ);
+                CreateMesh(chunkX, chunkZ);
             }
         }
 
@@ -324,7 +304,7 @@ public class CaveGen : MonoBehaviour
     }
 
     // Add Verts, Triangles and UVs to mesh
-    public void CreateMesh(int chunkX, int chunkZ, int maxX, int maxZ)
+    public void CreateMesh(int chunkX, int chunkZ)
     {
         meshData.Add(new MeshData());
 
@@ -335,16 +315,16 @@ public class CaveGen : MonoBehaviour
         else
             block = 0;
 
-        for (int x = chunkX; x < maxX; x++)
+        for (int x = 0; x < 16; x++)
         {
-            for (int y = 0; y < mapSizeY; y++)
+            for (int y = 0; y < maxHeight; y++)
             {
-                for (int z = chunkZ; z < maxZ; z++)
+                for (int z = 0; z < 16; z++)
                 {
                     // If block is solid(1)/air(0)
                     if (Block(x, y, z) != block)
                     {
-                        if (Block(x, y + 1, z) == block || y == mapSizeY - 1)
+                        if (Block(x, y + 1, z) == block || y == maxHeight - 1)
                         {
                             // Block above is air
                             CubeTop(x, y, z, Block(x, y, z));
@@ -356,28 +336,28 @@ public class CaveGen : MonoBehaviour
                             CubeBottom(x, y, z, Block(x, y, z));
                         }
 
-                        if (Block(x + 1, y, z) == block || x == maxX - 1)
+                        if (Block(x + 1, y, z) == block || x == 15)
                         {
                             //Block east is air
                             CubeEast(x, y, z, Block(x, y, z));
 
                         }
 
-                        if (Block(x - 1, y, z) == block || x == chunkX)
+                        if (Block(x - 1, y, z) == block || x == 0)
                         {
                             //Block west is air
                             CubeWest(x, y, z, Block(x, y, z));
 
                         }
 
-                        if (Block(x, y, z + 1) == block || z == maxZ - 1)
+                        if (Block(x, y, z + 1) == block || z == 15)
                         {
                             //Block north is air
                             CubeNorth(x, y, z, Block(x, y, z));
 
                         }
 
-                        if (Block(x, y, z - 1) == block || z == chunkZ)
+                        if (Block(x, y, z - 1) == block || z == 0)
                         {
                             //Block south is air
                             CubeSouth(x, y, z, Block(x, y, z));
@@ -386,10 +366,10 @@ public class CaveGen : MonoBehaviour
                 }
             }
         }
-        UpdateMesh();
+        UpdateMesh(chunkX, chunkZ);
     }
 
-    void UpdateMesh()
+    void UpdateMesh(int chunkX, int chunkZ)
     {
         for (int i = 0; i < meshData.Count; i++)
         {
@@ -400,22 +380,26 @@ public class CaveGen : MonoBehaviour
             // When generating new cave
             if (!updateMesh)
             {
-                GameObject go = new GameObject("Mesh");
+                GameObject go = new GameObject("Chunk");
 
                 go.transform.SetParent(transform);
+                go.transform.position = new Vector3(chunkX * 16, 0, chunkZ * 16);
+
+                //CaveData script = go.AddComponent<CaveData>();
+                //script.data = chunkData;
 
                 MeshRenderer renderer = go.AddComponent<MeshRenderer>();
                 renderer.material = material;
 
                 mesh = go.AddComponent<MeshFilter>().mesh;
 
-                meshObject.Add(go);
+                chunkList.Add(go);
             }
             else
             {
                 mesh = transform.GetChild(i).GetComponent<MeshFilter>().mesh;
             }
-
+            
             mesh.Clear();
             mesh.vertices = data.newVertices.ToArray();
             mesh.triangles = data.newTriangles.ToArray();

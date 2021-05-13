@@ -30,7 +30,7 @@ public class Raycast : MonoBehaviour
             Vector3 point = new Vector3(hit.point.x, hit.point.y, hit.point.z);
             point += (new Vector3(hit.normal.x, hit.normal.y, hit.normal.z)) * -0.5f;
 
-            script.data[Mathf.RoundToInt(point.x - 0.5f), Mathf.RoundToInt(point.y + 0.5f), Mathf.RoundToInt(point.z - 0.5f)] = 0;
+            script.chunkData[Mathf.RoundToInt(point.x - 0.5f), Mathf.RoundToInt(point.y + 0.5f), Mathf.RoundToInt(point.z - 0.5f)] = 0;
 
             //script.CreateMesh();
 

@@ -48,9 +48,6 @@ public class WorleyCave : MonoBehaviour
         byte block = 2; // 2 = null
         Vector3 localPos;
 
-        int offsetX = chunkX * 16;
-        int offsetZ = chunkZ * 16;
-
         // each chunk divided into 4 subchunks along X axis
         for (int x = 0; x < 4; x++)
         {
@@ -113,13 +110,13 @@ public class WorleyCave : MonoBehaviour
                             {
                                 int localZ = subz + z * 4;
                                 block = 2; // Null
-                                localPos = new Vector3(localX + offsetX, localY, localZ + offsetZ);
+                                localPos = new Vector3(localX, localY, localZ);
 
                                 if (depth == 0)
                                 {
                                     if (subx == 0 && subz == 0)
                                     {
-                                        block = script.data[(int)localPos.x, (int)localPos.y, (int)localPos.z];
+                                        block = script.chunkData[(int)localPos.x, (int)localPos.y, (int)localPos.z];
 
                                         // If block is solid???
                                         if (block == 1)
@@ -152,7 +149,7 @@ public class WorleyCave : MonoBehaviour
                                 if (noiseVal > adjustedNoiseCutoff)
                                 {
                                     if (block == 2)
-                                        block = script.data[(int)localPos.x, (int)localPos.y, (int)localPos.z];
+                                        block = script.chunkData[(int)localPos.x, (int)localPos.y, (int)localPos.z];
 
                                     DigBlock(localPos, block);
                                 }
@@ -185,7 +182,7 @@ public class WorleyCave : MonoBehaviour
 
 
         if (block == 1)
-            script.data[(int)blockPos.x, (int)blockPos.y, (int)blockPos.z] = b;
+            script.chunkData[(int)blockPos.x, (int)blockPos.y, (int)blockPos.z] = b;
     }
 
     float[,,] SampleNoise(int chunkX, int chunkZ, int maxSurfaceHeight)
