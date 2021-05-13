@@ -5,16 +5,7 @@ using UnityEngine;
 public class CaveData : MonoBehaviour
 {
     public byte[,,] data;
+    public Vector3 midPosition;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

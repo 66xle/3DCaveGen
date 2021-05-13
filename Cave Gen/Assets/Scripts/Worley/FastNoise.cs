@@ -7,34 +7,14 @@ public class FastNoise : MonoBehaviour
     private int seed;
     private float frequency = 0.01f;
 
-    private int octaves = 3;
-    private float lacunarity = 2.0f;
-    private float gain = 0.5f;
-
-    private float fractalBounding;
-
     public FastNoise(int s)
     {
         seed = s;
-        CalculateFractalBounding();
     }
 
     public void SetFrequency(float f)
     {
         frequency = f;
-    }
-
-    private void CalculateFractalBounding()
-    {
-        float amp = gain;
-        float ampFractal = 1;
-        for (int i = 1; i < octaves; i++)
-        {
-            ampFractal += amp;
-            amp *= gain;
-        }
-
-        fractalBounding = 1 / ampFractal;
     }
 
     public float GetNoise(float x, float y)

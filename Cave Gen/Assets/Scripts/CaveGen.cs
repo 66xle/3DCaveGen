@@ -64,7 +64,6 @@ public class CaveGen : MonoBehaviour
 
     // Bool
     [SerializeField] public bool swapData = false;
-    private bool updateMesh = false;
 
     private float startTime;
     private WorleyCave worley;
@@ -79,13 +78,9 @@ public class CaveGen : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.H))
-            SwapData();
 
         if (Input.GetKeyDown(KeyCode.G))
         {
-            updateMesh = false;
-
             DestroyChunk();
             Generate();
         }
@@ -240,23 +235,6 @@ public class CaveGen : MonoBehaviour
 
     #endregion
 
-    void SwapData()
-    {
-        startTime = Time.realtimeSinceStartup;
-
-        if (swapData)
-            swapData = false;
-        else
-            swapData = true;
-
-        updateMesh = false;
-
-        DestroyChunk();
-        //CreateMesh();
-
-        updateMesh = true;
-    }
-
     void Generate()
     {
         startTime = Time.realtimeSinceStartup;
@@ -292,9 +270,9 @@ public class CaveGen : MonoBehaviour
 
                 worley.CarveWorleyCaves(chunkX, chunkZ);
 
+                // Debugging
                 if (swapData)
                 {
-                    // Fill chunk with solid blocks
                     for (int y = 0; y < maxHeight; y++)
                     {
                         for (int z = 0; z < 16; z++)
@@ -310,17 +288,16 @@ public class CaveGen : MonoBehaviour
                     }
                 }
 
-                CreateMesh(chunkX, chunkZ);
+                CreateMesh();
+                UpdateMesh(chunkX, chunkZ);
             }
         }
-
-        updateMesh = true;
 
         Debug.Log("Loaded in " + (Time.realtimeSinceStartup - startTime) + " Seconds.");
     }
 
     // Add Verts, Triangles and UVs to mesh
-    public void CreateMesh(int chunkX, int chunkZ)
+    public void CreateMesh()
     {
         meshData.Add(new MeshData());
 
@@ -375,7 +352,6 @@ public class CaveGen : MonoBehaviour
                 }
             }
         }
-        UpdateMesh(chunkX, chunkZ);
     }
 
     void UpdateMesh(int chunkX, int chunkZ)
@@ -386,29 +362,24 @@ public class CaveGen : MonoBehaviour
 
             Mesh mesh;
 
-            // When generating new cave
-            if (!updateMesh)
-            {
-                GameObject go = new GameObject("Chunk");
+            GameObject go = new GameObject("Chunk");
 
-                go.transform.SetParent(transform);
-                go.transform.position = new Vector3(chunkX * 16, 0, chunkZ * 16);
+            go.transform.SetParent(transform);
+            go.transform.position = new Vector3(chunkX * 16, 0, chunkZ * 16);
 
-                //CaveData script = go.AddComponent<CaveData>();
-                //script.data = chunkData;
+            // Store data into chunk
+            CaveData script = go.AddComponent<CaveData>();
+            script.data = chunkData;
+            script.midPosition = new Vector3(go.transform.position.x + 8.0f, 0, go.transform.position.z + 8.0f);
 
-                MeshRenderer renderer = go.AddComponent<MeshRenderer>();
-                renderer.material = material;
+            MeshRenderer renderer = go.AddComponent<MeshRenderer>();
+            renderer.material = material;
 
-                mesh = go.AddComponent<MeshFilter>().mesh;
+            mesh = go.AddComponent<MeshFilter>().mesh;
 
-                chunkList.Add(go);
-            }
-            else
-            {
-                mesh = transform.GetChild(i).GetComponent<MeshFilter>().mesh;
-            }
-            
+            chunkList.Add(go);
+
+
             mesh.Clear();
             mesh.vertices = data.newVertices.ToArray();
             mesh.triangles = data.newTriangles.ToArray();
