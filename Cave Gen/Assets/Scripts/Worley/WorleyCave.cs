@@ -173,16 +173,9 @@ public class WorleyCave : MonoBehaviour
 
     void DigBlock(Vector3 blockPos, byte block)
     {
-        byte b;
-
-        if (script.swapData)
-            b = 1;
-        else
-            b = 0;
-
 
         if (block == 1)
-            script.chunkData[(int)blockPos.x, (int)blockPos.y, (int)blockPos.z] = b;
+            script.chunkData[(int)blockPos.x, (int)blockPos.y, (int)blockPos.z] = 0;
     }
 
     float[,,] SampleNoise(int chunkX, int chunkZ, int maxSurfaceHeight)

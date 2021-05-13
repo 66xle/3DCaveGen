@@ -103,10 +103,7 @@ public class CaveGen : MonoBehaviour
     {
         if (x >= 16 || x < 0 || y >= maxHeight || y < 0 || z >= 16 || z < 0)
         {
-            if (swapData)
-                return 0;
-            else
-                return 1;
+            return 1;
         }
 
         return chunkData[x, y, z];
@@ -294,6 +291,25 @@ public class CaveGen : MonoBehaviour
                 }
 
                 worley.CarveWorleyCaves(chunkX, chunkZ);
+
+                if (swapData)
+                {
+                    // Fill chunk with solid blocks
+                    for (int y = 0; y < maxHeight; y++)
+                    {
+                        for (int z = 0; z < 16; z++)
+                        {
+                            for (int x = 0; x < 16; x++)
+                            {
+                                if (chunkData[x, y, z] == 1)
+                                    chunkData[x, y, z] = 0;
+                                else if (chunkData[x, y, z] == 0)
+                                    chunkData[x, y, z] = 1;
+                            }
+                        }
+                    }
+                }
+
                 CreateMesh(chunkX, chunkZ);
             }
         }
@@ -308,13 +324,6 @@ public class CaveGen : MonoBehaviour
     {
         meshData.Add(new MeshData());
 
-        byte block;
-
-        if (swapData)
-            block = 1;
-        else
-            block = 0;
-
         for (int x = 0; x < 16; x++)
         {
             for (int y = 0; y < maxHeight; y++)
@@ -322,42 +331,42 @@ public class CaveGen : MonoBehaviour
                 for (int z = 0; z < 16; z++)
                 {
                     // If block is solid(1)/air(0)
-                    if (Block(x, y, z) != block)
+                    if (Block(x, y, z) != 0)
                     {
-                        if (Block(x, y + 1, z) == block || y == maxHeight - 1)
+                        if (Block(x, y + 1, z) == 0 || y == maxHeight - 1)
                         {
                             // Block above is air
                             CubeTop(x, y, z, Block(x, y, z));
                         }
 
-                        if (Block(x, y - 1, z) == block || y == 0)
+                        if (Block(x, y - 1, z) == 0 || y == 0)
                         {
                             //Block below is air
                             CubeBottom(x, y, z, Block(x, y, z));
                         }
 
-                        if (Block(x + 1, y, z) == block || x == 15)
+                        if (Block(x + 1, y, z) == 0 || x == 15)
                         {
                             //Block east is air
                             CubeEast(x, y, z, Block(x, y, z));
 
                         }
 
-                        if (Block(x - 1, y, z) == block || x == 0)
+                        if (Block(x - 1, y, z) == 0 || x == 0)
                         {
                             //Block west is air
                             CubeWest(x, y, z, Block(x, y, z));
 
                         }
 
-                        if (Block(x, y, z + 1) == block || z == 15)
+                        if (Block(x, y, z + 1) == 0 || z == 15)
                         {
                             //Block north is air
                             CubeNorth(x, y, z, Block(x, y, z));
 
                         }
 
-                        if (Block(x, y, z - 1) == block || z == 0)
+                        if (Block(x, y, z - 1) == 0 || z == 0)
                         {
                             //Block south is air
                             CubeSouth(x, y, z, Block(x, y, z));

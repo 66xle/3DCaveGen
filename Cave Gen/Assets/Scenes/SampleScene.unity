@@ -154,9 +154,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHeight: 130
-  chunkDistance: 1
+  chunkDistance: 3
   material: {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
-  swapData: 0
+  swapData: 1
 --- !u!4 &114025011
 Transform:
   m_ObjectHideFlags: 0
