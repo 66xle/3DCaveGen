@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     public float walkSpeed;
+    public float jumpForce;
 
     Rigidbody rb;
     Vector3 moveDir;
@@ -20,6 +21,11 @@ public class PlayerMovement : MonoBehaviour
         float vertical = Input.GetAxisRaw("Vertical");
 
         moveDir = (horizontal * transform.right + vertical * transform.forward).normalized;
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            rb.velocity = transform.up * jumpForce;
+        }
     }
 
     void FixedUpdate()
