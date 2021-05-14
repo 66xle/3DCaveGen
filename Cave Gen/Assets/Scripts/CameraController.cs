@@ -32,13 +32,13 @@ public class CameraController : MonoBehaviour
             Cursor.visible = true;
         }
 
-        rotX += Input.GetAxis("Mouse X") * sensitivityX;
-        rotY += Input.GetAxis("Mouse Y") * sensitivityY;
+        rotX += Input.GetAxis("Mouse Y") * sensitivityX;
+        rotY += Input.GetAxis("Mouse X") * sensitivityY;
 
         rotX = Mathf.Clamp(rotX, minX, maxX);
 
         transform.localEulerAngles = new Vector3(0, rotY, 0);
-        cam.transform.localEulerAngles = new Vector3(-rotX, rotY, 0);
+        cam.transform.localEulerAngles = new Vector3(-rotX, 0, 0);
 
     }
 }
