@@ -26,33 +26,9 @@ public class CaveGen : MonoBehaviour
     public int chunkDistance;
     public Material material;
 
-    //[Header("Perlin Values")]
-    //public double frequency = 1.0;
-    //public double lacunarity = 2.375;
-    //public double persistence = 0.5;
-    //public int octaves = 3;
-    //public int seed = 0;
-    //
-    //[Header("Voronoi Values")]
-    //public float displacement = 1;
-    //public bool distance = false;
-    //
-    //[Header("Noise Values")]
-    //public float noiseDivider = 15.0f;
-    //public float maxThreshold = 0.5f;
-    //public float minThreshold = -0.5f;
-
-    //ModuleBase perlin;
-    //ModuleBase rigged;
-    //ModuleBase billow;
-    //ModuleBase voronoi;
-    //ModuleBase cylinders;
-    //ModuleBase spheres;
-    //ModuleBase add;
-
     // Mesh Stuff
     private List<MeshData> meshData = new List<MeshData>();
-    private List<GameObject> chunkList = new List<GameObject>();
+    public List<GameObject> chunkList = new List<GameObject>();
 
     private int index = 0;
     private int vertexCount = 0;
@@ -71,8 +47,6 @@ public class CaveGen : MonoBehaviour
     {
         worley = GetComponent<WorleyCave>();
         worley.Setup();
-
-        Generate();
     }
 
     void Update()
@@ -88,7 +62,7 @@ public class CaveGen : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.G))
         {
             DestroyChunk();
-            Generate();
+            StartGen();
         }
     }
 
@@ -243,65 +217,59 @@ public class CaveGen : MonoBehaviour
 
     #endregion
 
-    public void Generate()
+    public void StartGen()
     {
         startTime = Time.realtimeSinceStartup;
-
-        //perlin = new Perlin(frequency, lacunarity, persistence, octaves, seed, QualityMode.High);
-        //rigged = new RiggedMultifractal(frequency, lacunarity, octaves, seed, QualityMode.High);
-        //voronoi = new Voronoi(frequency, displacement, seed, distance);
-        //billow = new Billow(frequency, lacunarity, persistence, octaves, seed, QualityMode.High);
-        //cylinders = new Cylinders(frequency);
-        //spheres = new Spheres(frequency);
-
-        //add = new Add(rigged, perlin);
-        //add = new Blend(spheres, perlin, billow);
-        //add = new Multiply(rigged, perlin);
 
         for (int chunkX = -chunkDistance; chunkX <= chunkDistance; chunkX++)
         {
             for (int chunkZ = -chunkDistance; chunkZ <= chunkDistance; chunkZ++)
             {
-                chunkData = new byte[16, maxHeight, 16];
-
-                // Fill chunk with solid blocks
-                for (int y = 0; y < maxHeight; y++)
-                {
-                    for (int z = 0; z < 16; z++)
-                    {
-                        for (int x = 0; x < 16; x++)
-                        {
-                            chunkData[x, y, z] = 1;
-                        }
-                    }
-                }
-
-                worley.CarveWorleyCaves(chunkX, chunkZ);
-
-                // Swap Air/Block to Block/Air
-                if (swapData)
-                {
-                    for (int y = 0; y < maxHeight; y++)
-                    {
-                        for (int z = 0; z < 16; z++)
-                        {
-                            for (int x = 0; x < 16; x++)
-                            {
-                                if (chunkData[x, y, z] == 1)
-                                    chunkData[x, y, z] = 0;
-                                else if (chunkData[x, y, z] == 0)
-                                    chunkData[x, y, z] = 1;
-                            }
-                        }
-                    }
-                }
-
-                CreateMesh();
-                UpdateMesh(chunkX, chunkZ);
+                Generate(chunkX, chunkZ);
             }
         }
 
         Debug.Log("Loaded in " + (Time.realtimeSinceStartup - startTime) + " Seconds.");
+    }
+
+    public void Generate(int chunkX, int chunkZ)
+    {
+        chunkData = new byte[16, maxHeight, 16];
+
+        // Fill chunk with solid blocks
+        for (int y = 0; y < maxHeight; y++)
+        {
+            for (int z = 0; z < 16; z++)
+            {
+                for (int x = 0; x < 16; x++)
+                {
+                    chunkData[x, y, z] = 1;
+                }
+            }
+        }
+
+        worley.CarveWorleyCaves(chunkX, chunkZ);
+
+        // Swap Air/Block to Block/Air
+        if (swapData)
+        {
+            for (int y = 0; y < maxHeight; y++)
+            {
+                for (int z = 0; z < 16; z++)
+                {
+                    for (int x = 0; x < 16; x++)
+                    {
+                        if (chunkData[x, y, z] == 1)
+                            chunkData[x, y, z] = 0;
+                        else if (chunkData[x, y, z] == 0)
+                            chunkData[x, y, z] = 1;
+                    }
+                }
+            }
+        }
+
+        CreateMesh();
+        UpdateMesh(chunkX, chunkZ);
     }
 
     // Add Verts, Triangles and UVs to mesh
@@ -371,23 +339,24 @@ public class CaveGen : MonoBehaviour
             Mesh mesh;
 
             // Create new gameobject
-            GameObject go = new GameObject("Chunk");
+            GameObject chunk = new GameObject("Chunk");
 
-            go.transform.SetParent(transform);
-            go.transform.position = new Vector3(chunkX * 16, 0, chunkZ * 16);
+            chunk.transform.SetParent(transform);
+            chunk.transform.position = new Vector3(chunkX * 16, 0, chunkZ * 16);
 
             // Store data into chunk
-            CaveData script = go.AddComponent<CaveData>();
+            CaveData script = chunk.AddComponent<CaveData>();
             script.data = chunkData;
-            script.midPosition = new Vector3(go.transform.position.x + 8.0f, 0, go.transform.position.z + 8.0f);
+            script.midPosition = new Vector3(chunk.transform.position.x + 8.0f, 0, chunk.transform.position.z + 8.0f);
+            script.chunkPosition = new Vector2(chunkX, chunkZ);
 
-            MeshRenderer renderer = go.AddComponent<MeshRenderer>();
+            MeshRenderer renderer = chunk.AddComponent<MeshRenderer>();
             renderer.material = material;
 
-            mesh = go.AddComponent<MeshFilter>().mesh;
-            MeshCollider mc = go.AddComponent<MeshCollider>();
+            mesh = chunk.AddComponent<MeshFilter>().mesh;
+            MeshCollider mc = chunk.AddComponent<MeshCollider>();
 
-            chunkList.Add(go);
+            chunkList.Add(chunk);
 
 
             mesh.Clear();
@@ -405,5 +374,10 @@ public class CaveGen : MonoBehaviour
         vertexCount = 0;
         index = 0;
         faceCount = 0;
+    }
+
+    public Vector2 GetChunkMidPos(int chunkX, int chunkZ)
+    {
+        return new Vector2(chunkX * 16 + 8.0f, chunkZ * 16 + 8.0f);
     }
 }
