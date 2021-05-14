@@ -28,7 +28,7 @@ public class CaveGen : MonoBehaviour
 
     // Mesh Stuff
     private List<MeshData> meshData = new List<MeshData>();
-    public List<GameObject> chunkList = new List<GameObject>();
+    public List<CaveData> chunkList = new List<CaveData>();
 
     private int index = 0;
     private int vertexCount = 0;
@@ -43,7 +43,7 @@ public class CaveGen : MonoBehaviour
     private float startTime;
     private WorleyCave worley;
 
-    void Start()
+    void Awake()
     {
         worley = GetComponent<WorleyCave>();
         worley.Setup();
@@ -52,9 +52,8 @@ public class CaveGen : MonoBehaviour
     void Update()
     {
         // Shows middle of every chunk
-        foreach (GameObject go in chunkList)
+        foreach (CaveData data in chunkList)
         {
-            CaveData data = go.GetComponent<CaveData>();
             Debug.DrawLine(data.midPosition, new Vector3(data.midPosition.x, maxHeight + 20.0f, data.midPosition.z), Color.red);
         }
 
@@ -69,9 +68,10 @@ public class CaveGen : MonoBehaviour
     void DestroyChunk()
     {
         // Destory all chunks
-        foreach (GameObject go in chunkList)
+        foreach (CaveData data in chunkList)
         {
-            Destroy(go);
+            Destroy(data.chunkObject);
+            chunkList.Remove(data);
         }
     }
 
@@ -344,19 +344,11 @@ public class CaveGen : MonoBehaviour
             chunk.transform.SetParent(transform);
             chunk.transform.position = new Vector3(chunkX * 16, 0, chunkZ * 16);
 
-            // Store data into chunk
-            CaveData script = chunk.AddComponent<CaveData>();
-            script.data = chunkData;
-            script.midPosition = new Vector3(chunk.transform.position.x + 8.0f, 0, chunk.transform.position.z + 8.0f);
-            script.chunkPosition = new Vector2(chunkX, chunkZ);
-
             MeshRenderer renderer = chunk.AddComponent<MeshRenderer>();
             renderer.material = material;
 
             mesh = chunk.AddComponent<MeshFilter>().mesh;
             MeshCollider mc = chunk.AddComponent<MeshCollider>();
-
-            chunkList.Add(chunk);
 
 
             mesh.Clear();
@@ -367,6 +359,10 @@ public class CaveGen : MonoBehaviour
             mesh.RecalculateNormals();
 
             mc.sharedMesh = mesh; // Collider
+
+            // Store data into chunk
+            CaveData caveData = new CaveData(chunkX, chunkZ, chunkData, chunk);
+            chunkList.Add(caveData);
         }
 
         meshData.Clear();
@@ -374,10 +370,5 @@ public class CaveGen : MonoBehaviour
         vertexCount = 0;
         index = 0;
         faceCount = 0;
-    }
-
-    public Vector2 GetChunkMidPos(int chunkX, int chunkZ)
-    {
-        return new Vector2(chunkX * 16 + 8.0f, chunkZ * 16 + 8.0f);
     }
 }

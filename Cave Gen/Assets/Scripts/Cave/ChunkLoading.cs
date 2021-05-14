@@ -10,7 +10,9 @@ public class ChunkLoading : MonoBehaviour
 
     List<CaveData> notLoadedChunks = new List<CaveData>();
 
-    Vector2 currentChunk;
+    List<CaveData> deleteData = new List<CaveData>();
+
+    Vector2 currentChunk = new Vector2(-9999, -9999);
     Vector2 newChunk;
 
     void Start()
@@ -23,28 +25,21 @@ public class ChunkLoading : MonoBehaviour
         // Gets the chunk the player is on
         GetCurrentChunk();
 
-        // If player is near unloaded chunk, generate it
-        foreach (CaveData data in notLoadedChunks)
+        // If player is not near loaded chunk, delete it
+        foreach (CaveData data in script.chunkList)
         {
-            float distance = Vector2.Distance(new Vector2(player.position.x, player.position.z), data.chunkPosition);
-
-            if (distance < script.chunkDistance)
+            float distance = Vector2.Distance(currentChunk, data.chunkPosition);
+        
+            if (distance > script.chunkDistance)
             {
-                script.Generate((int)data.chunkPosition.x, (int)data.chunkPosition.y);
+                Destroy(data.chunkObject);
+                deleteData.Add(data);
             }
         }
 
-        // If player is not near loaded chunk, delete it
-        foreach (GameObject chunk in script.chunkList)
+        foreach (CaveData data in deleteData)
         {
-            CaveData data = chunk.GetComponent<CaveData>();
-
-            float distance = Vector2.Distance(new Vector2(player.position.x, player.position.z), data.chunkPosition);
-
-            if (distance > script.chunkDistance)
-            {
-                Destroy(chunk);
-            }
+            script.chunkList.Remove(data);
         }
     }
 
@@ -52,10 +47,8 @@ public class ChunkLoading : MonoBehaviour
     {
         float minDistance = 100;
 
-        foreach (GameObject chunk in script.chunkList)
+        foreach (CaveData data in script.chunkList)
         {
-            CaveData data = chunk.GetComponent<CaveData>();
-
             float distance = Vector2.Distance(new Vector2(player.position.x, player.position.z), new Vector2(data.midPosition.x, data.midPosition.z));
 
             // Find nearest chunk midpoint
@@ -75,8 +68,9 @@ public class ChunkLoading : MonoBehaviour
         // Check if player has moved from to a different chunk
         if (newChunk != currentChunk)
         {
-            currentChunk = newChunk;
             notLoadedChunks.Clear();
+
+            currentChunk = newChunk;
 
             int chunkDistance = script.chunkDistance + 1;
 
@@ -86,11 +80,25 @@ public class ChunkLoading : MonoBehaviour
                 {
                     if (x == -chunkDistance + (int)currentChunk.x || x == chunkDistance + (int)currentChunk.x || z == -chunkDistance + (int)currentChunk.y || z == chunkDistance + (int)currentChunk.y)
                     {
-                        CaveData data;
-                        data.VarSetup(x, z);
+                        CaveData data = new CaveData(x, z);
 
                         // Add chunks not loaded around gen chunks
                         notLoadedChunks.Add(data);
+                    }
+                    else
+                    {
+                        bool chunkExists = false;
+
+                        foreach (CaveData data in script.chunkList)
+                        {
+                            if (data.chunkPosition == new Vector2(x, z))
+                            {
+                                chunkExists = true;
+                            }  
+                        }
+
+                        if (!chunkExists)
+                            script.Generate(x, z);
                     }
                 }
             }
