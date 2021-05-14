@@ -115,7 +115,7 @@ public class WorleyCave : MonoBehaviour
                                     {
                                         block = script.chunkData[(int)localPos.x, (int)localPos.y, (int)localPos.z];
 
-                                        // If block is solid???
+                                        // If block is solid
                                         if (block == 1)
                                             depth++;
                                     }
@@ -145,7 +145,7 @@ public class WorleyCave : MonoBehaviour
 
                                 if (noiseVal > adjustedNoiseCutoff)
                                 {
-                                    if (block == 2)
+                                    if (block == 2) // If block is null
                                         block = script.chunkData[(int)localPos.x, (int)localPos.y, (int)localPos.z];
 
                                     DigBlock(localPos, block);
@@ -170,7 +170,6 @@ public class WorleyCave : MonoBehaviour
 
     void DigBlock(Vector3 blockPos, byte block)
     {
-
         if (block == 1)
             script.chunkData[(int)blockPos.x, (int)blockPos.y, (int)blockPos.z] = 0;
     }

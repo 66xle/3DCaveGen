@@ -62,8 +62,7 @@ public class CaveGen : MonoBehaviour
 
     private int faceCount;
 
-    // Bool
-    [SerializeField] public bool swapData = false;
+    [Tooltip("Gen cave inside out")] public bool swapData = false;
 
     private float startTime;
     private WorleyCave worley;
@@ -78,12 +77,14 @@ public class CaveGen : MonoBehaviour
 
     void Update()
     {
+        // Shows middle of every chunk
         foreach (GameObject go in chunkList)
         {
             CaveData data = go.GetComponent<CaveData>();
             Debug.DrawLine(data.midPosition, new Vector3(data.midPosition.x, maxHeight + 20.0f, data.midPosition.z), Color.red);
         }
 
+        // Generate Cave again
         if (Input.GetKeyDown(KeyCode.G))
         {
             DestroyChunk();
@@ -93,6 +94,7 @@ public class CaveGen : MonoBehaviour
 
     void DestroyChunk()
     {
+        // Destory all chunks
         foreach (GameObject go in chunkList)
         {
             Destroy(go);
@@ -101,6 +103,7 @@ public class CaveGen : MonoBehaviour
 
     public byte Block(int x, int y, int z)
     {
+        // Outside of data array
         if (x >= 16 || x < 0 || y >= maxHeight || y < 0 || z >= 16 || z < 0)
         {
             return 1;
@@ -240,7 +243,7 @@ public class CaveGen : MonoBehaviour
 
     #endregion
 
-    void Generate()
+    public void Generate()
     {
         startTime = Time.realtimeSinceStartup;
 
@@ -275,7 +278,7 @@ public class CaveGen : MonoBehaviour
 
                 worley.CarveWorleyCaves(chunkX, chunkZ);
 
-                // Debugging
+                // Swap Air/Block to Block/Air
                 if (swapData)
                 {
                     for (int y = 0; y < maxHeight; y++)
@@ -306,13 +309,14 @@ public class CaveGen : MonoBehaviour
     {
         meshData.Add(new MeshData());
 
+        // Loop through chunk data
         for (int x = 0; x < 16; x++)
         {
             for (int y = 0; y < maxHeight; y++)
             {
                 for (int z = 0; z < 16; z++)
                 {
-                    // If block is solid(1)/air(0)
+                    // If block is solid
                     if (Block(x, y, z) != 0)
                     {
                         if (Block(x, y + 1, z) == 0 || y == maxHeight - 1)
@@ -364,9 +368,9 @@ public class CaveGen : MonoBehaviour
         for (int i = 0; i < meshData.Count; i++)
         {
             MeshData data = meshData[i];
-
             Mesh mesh;
 
+            // Create new gameobject
             GameObject go = new GameObject("Chunk");
 
             go.transform.SetParent(transform);
@@ -393,7 +397,7 @@ public class CaveGen : MonoBehaviour
             mesh.Optimize();
             mesh.RecalculateNormals();
 
-            mc.sharedMesh = mesh;
+            mc.sharedMesh = mesh; // Collider
         }
 
         meshData.Clear();
