@@ -381,6 +381,7 @@ public class CaveGen : MonoBehaviour
             renderer.material = material;
 
             mesh = go.AddComponent<MeshFilter>().mesh;
+            MeshCollider mc = go.AddComponent<MeshCollider>();
 
             chunkList.Add(go);
 
@@ -391,6 +392,8 @@ public class CaveGen : MonoBehaviour
             mesh.uv = data.newUV.ToArray();
             mesh.Optimize();
             mesh.RecalculateNormals();
+
+            mc.sharedMesh = mesh;
         }
 
         meshData.Clear();
