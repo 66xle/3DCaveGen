@@ -23,7 +23,8 @@ public class ChunkLoading : MonoBehaviour
     void Update()
     {
         // Gets the chunk the player is on
-        GetCurrentChunk();
+        newChunk = script.GetChunkPosition(player.position);
+        GetOutsideChunks();
 
         // If player is not near loaded chunk, delete it
         foreach (CaveData data in script.chunkList)
@@ -41,26 +42,6 @@ public class ChunkLoading : MonoBehaviour
         {
             script.chunkList.Remove(data);
         }
-    }
-
-    void GetCurrentChunk()
-    {
-        float minDistance = 100;
-
-        foreach (CaveData data in script.chunkList)
-        {
-            float distance = Vector2.Distance(new Vector2(player.position.x, player.position.z), new Vector2(data.midPosition.x, data.midPosition.z));
-
-            // Find nearest chunk midpoint
-            if (distance < minDistance)
-            {
-                minDistance = distance;
-
-                newChunk = data.chunkPosition;
-            }
-        }
-
-        GetOutsideChunks();
     }
 
     void GetOutsideChunks()
@@ -94,6 +75,7 @@ public class ChunkLoading : MonoBehaviour
                             if (data.chunkPosition == new Vector2(x, z))
                             {
                                 chunkExists = true;
+                                break;
                             }  
                         }
 

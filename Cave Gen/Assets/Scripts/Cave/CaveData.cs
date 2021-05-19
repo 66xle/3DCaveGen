@@ -21,4 +21,5 @@ public class CaveData
         chunkPosition = new Vector2(chunkX, chunkZ);
         chunkObject = go;
         chunkData = data;
-    }}
+    }
+}

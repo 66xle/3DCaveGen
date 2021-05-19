@@ -371,4 +371,26 @@ public class CaveGen : MonoBehaviour
         index = 0;
         faceCount = 0;
     }
+
+    // Methods
+    public Vector2 GetChunkPosition(Vector3 position)
+    {
+        float minDistance = 100;
+        Vector2 newChunk = new Vector2();
+
+        foreach (CaveData data in chunkList)
+        {
+            float distance = Vector2.Distance(new Vector2(position.x, position.z), new Vector2(data.midPosition.x, data.midPosition.z));
+
+            // Find nearest chunk midpoint
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+
+                newChunk = data.chunkPosition;
+            }
+        }
+
+        return newChunk;
+    }
 }
