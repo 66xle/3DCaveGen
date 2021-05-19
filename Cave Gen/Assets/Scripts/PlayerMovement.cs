@@ -36,7 +36,7 @@ public class PlayerMovement : MonoBehaviour
     void Move()
     {
         Vector3 yVelFix = new Vector3(0, rb.velocity.y, 0);
-        rb.velocity = moveDir * walkSpeed * Time.deltaTime;
+        rb.velocity = moveDir * (walkSpeed * 100) * Time.deltaTime;
         rb.velocity += yVelFix;
     }
 }

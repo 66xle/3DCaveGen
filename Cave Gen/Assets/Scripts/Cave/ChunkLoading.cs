@@ -37,7 +37,7 @@ public class ChunkLoading : MonoBehaviour
     {
         foreach (CaveData data in createChunk)
         {
-            script.Generate((int)data.chunkPosition.x, (int)data.chunkPosition.y);
+            script.GenerateChunk((int)data.chunkPosition.x, (int)data.chunkPosition.y);
             createChunk.Remove(data);
             return; // Return so we can create a chunk every frame
         }

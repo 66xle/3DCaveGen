@@ -216,6 +216,9 @@ public class CaveGen : MonoBehaviour
 
     #endregion
 
+    /// <summary>
+    /// Create Chunks depending on chunk distance
+    /// </summary>
     public void StartGen()
     {
         startTime = Time.realtimeSinceStartup;
@@ -224,14 +227,14 @@ public class CaveGen : MonoBehaviour
         {
             for (int chunkZ = -chunkDistance; chunkZ <= chunkDistance; chunkZ++)
             {
-                Generate(chunkX, chunkZ);
+                GenerateChunk(chunkX, chunkZ);
             }
         }
 
         Debug.Log("Loaded in " + (Time.realtimeSinceStartup - startTime) + " Seconds.");
     }
 
-    public void Generate(int chunkX, int chunkZ)
+    public void GenerateChunk(int chunkX, int chunkZ)
     {
         chunkData = new byte[16, maxHeight, 16];
 
@@ -272,7 +275,7 @@ public class CaveGen : MonoBehaviour
     }
 
     // Add Verts, Triangles and UVs to mesh
-    public void CreateMesh()
+    void CreateMesh()
     {
         meshData.Add(new MeshData());
 
