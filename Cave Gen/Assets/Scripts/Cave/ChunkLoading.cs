@@ -5,13 +5,10 @@ using UnityEngine;
 public class ChunkLoading : MonoBehaviour
 {
     public CaveGen script;
-
     public Transform player;
 
     List<CaveData> notLoadedChunks = new List<CaveData>();
-
     List<CaveData> deleteData = new List<CaveData>();
-
     List<CaveData> createChunk = new List<CaveData>();
 
     Vector2 currentChunk = new Vector2(-9999, -9999);
@@ -42,7 +39,7 @@ public class ChunkLoading : MonoBehaviour
         {
             script.Generate((int)data.chunkPosition.x, (int)data.chunkPosition.y);
             createChunk.Remove(data);
-            return;
+            return; // Return so we can create a chunk every frame
         }
     }
 
@@ -71,9 +68,9 @@ public class ChunkLoading : MonoBehaviour
                         // Add chunks not loaded around gen chunks
                         notLoadedChunks.Add(data);
 
-                        // If chunk is outside player chunk radius, delete the chunk
                         foreach (CaveData d in script.chunkList)
                         {
+                            // If chunk is outside player chunk radius, delete the chunk
                             if (d.chunkPosition == data.chunkPosition)
                             {
                                 Destroy(d.chunkObject);
@@ -85,7 +82,6 @@ public class ChunkLoading : MonoBehaviour
                     {
                         bool chunkExists = false;
 
-                        
                         foreach (CaveData data in script.chunkList)
                         {
                             // If chunk does exist don't create chunk

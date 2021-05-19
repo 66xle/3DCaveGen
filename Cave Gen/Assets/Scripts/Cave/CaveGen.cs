@@ -32,11 +32,10 @@ public class CaveGen : MonoBehaviour
 
     private int index = 0;
     private int vertexCount = 0;
-
     private float tUnit = 0.25f;
     private Vector2 tStone = new Vector2(1, 0);
-
     private int faceCount;
+
 
     [Tooltip("Gen cave inside out")] public bool swapData = false;
 
@@ -347,10 +346,9 @@ public class CaveGen : MonoBehaviour
             MeshRenderer renderer = chunk.AddComponent<MeshRenderer>();
             renderer.material = material;
 
+
+            // Set mesh stuff
             mesh = chunk.AddComponent<MeshFilter>().mesh;
-            MeshCollider mc = chunk.AddComponent<MeshCollider>();
-
-
             mesh.Clear();
             mesh.vertices = data.newVertices.ToArray();
             mesh.triangles = data.newTriangles.ToArray();
@@ -358,7 +356,9 @@ public class CaveGen : MonoBehaviour
             mesh.Optimize();
             mesh.RecalculateNormals();
 
-            mc.sharedMesh = mesh; // Collider
+            // Set colldier
+            MeshCollider mc = chunk.AddComponent<MeshCollider>();
+            mc.sharedMesh = mesh;
 
             // Store data into chunk
             CaveData caveData = new CaveData(chunkX, chunkZ, chunkData, chunk);
