@@ -738,8 +738,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db4bf1a7422571a44b7eaa5e48b4b0a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  script: {fileID: 114025010}
   walkSpeed: 5
   jumpForce: 5
+  cam: {fileID: 963194228}
 --- !u!54 &1467407482
 Rigidbody:
   m_ObjectHideFlags: 0

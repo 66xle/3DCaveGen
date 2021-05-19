@@ -53,7 +53,7 @@ public class CaveGen : MonoBehaviour
         // Shows middle of every chunk
         foreach (CaveData data in chunkList)
         {
-            Debug.DrawLine(data.midPosition, new Vector3(data.midPosition.x, maxHeight + 20.0f, data.midPosition.z), Color.red);
+            //Debug.DrawLine(data.midPosition, new Vector3(data.midPosition.x, maxHeight + 20.0f, data.midPosition.z), Color.red);
         }
 
         // Generate Cave again
@@ -375,6 +375,34 @@ public class CaveGen : MonoBehaviour
         faceCount = 0;
     }
 
+    void RecalculateMesh(CaveData d)
+    {
+        for (int i = 0; i < meshData.Count; i++)
+        {
+            MeshData data = meshData[i];
+            Mesh mesh;
+
+            // Set mesh stuff
+            mesh = d.chunkObject.GetComponent<MeshFilter>().mesh;
+            mesh.Clear();
+            mesh.vertices = data.newVertices.ToArray();
+            mesh.triangles = data.newTriangles.ToArray();
+            mesh.uv = data.newUV.ToArray();
+            mesh.Optimize();
+            mesh.RecalculateNormals();
+
+            // Set colldier
+            MeshCollider mc = d.chunkObject.GetComponent<MeshCollider>();
+            mc.sharedMesh = mesh;
+        }
+
+        meshData.Clear();
+
+        vertexCount = 0;
+        index = 0;
+        faceCount = 0;
+    }
+
     // Methods
     public Vector2 GetChunkPosition(Vector3 position)
     {
@@ -395,5 +423,31 @@ public class CaveGen : MonoBehaviour
         }
 
         return newChunk;
+    }
+
+    /// <summary>
+    /// Change data in a chunk
+    /// </summary>
+    /// <param name="dataPosition">The data is in world position</param>
+    /// <param name="chunkPosition"></param>
+    /// <param name="block">Solid = 1, Air = 0</param>
+    public void SetData(Vector3 dataPosition, byte data)
+    {
+        Vector2 chunkPosition = GetChunkPosition(dataPosition);
+        Vector3 newDataPosition = new Vector3(Mathf.RoundToInt(dataPosition.x - 0.5f) - chunkPosition.x * 16, Mathf.RoundToInt(dataPosition.y + 0.5f), Mathf.RoundToInt(dataPosition.z - 0.5f) - chunkPosition.y * 16);
+
+        foreach (CaveData d in chunkList)
+        {
+            if (d.chunkPosition == chunkPosition)
+            {
+                d.chunkData[(int)newDataPosition.x, (int)newDataPosition.y, (int)newDataPosition.z] = data;
+
+                chunkData = d.chunkData;
+                CreateMesh();
+                RecalculateMesh(d);
+
+                break;
+            }
+        }
     }
 }
