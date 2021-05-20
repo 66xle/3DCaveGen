@@ -7,7 +7,6 @@ public class ChunkLoading : MonoBehaviour
     public CaveGen script;
     public Transform player;
 
-    List<CaveData> notLoadedChunks = new List<CaveData>();
     List<CaveData> deleteData = new List<CaveData>();
     List<CaveData> createChunk = new List<CaveData>();
 
@@ -26,11 +25,6 @@ public class ChunkLoading : MonoBehaviour
         ScanChunkRadius();
 
         CreateChunks();
-
-        foreach (CaveData data in deleteData)
-        {
-            script.chunkList.Remove(data);
-        }
     }
 
     void CreateChunks()
@@ -48,8 +42,7 @@ public class ChunkLoading : MonoBehaviour
         // Check if player has moved from to a different chunk
         if (newChunk != currentChunk)
         {
-            notLoadedChunks.Clear();
-            createChunk.Clear();
+              createChunk.Clear();
 
             currentChunk = newChunk; // Set player current chunk
 
@@ -60,26 +53,12 @@ public class ChunkLoading : MonoBehaviour
             {
                 for (int z = -chunkDistance + (int)currentChunk.y; z <= chunkDistance + (int)currentChunk.y; z++)
                 {
-                    // If x/z is around the current generated chunks
-                    if (x == -chunkDistance + (int)currentChunk.x || x == chunkDistance + (int)currentChunk.x || z == -chunkDistance + (int)currentChunk.y || z == chunkDistance + (int)currentChunk.y)
+                    int distance = (int)Vector2.Distance(currentChunk, new Vector2(x, z));
+                    
+                    if (distance <= script.chunkDistance)
                     {
-                        CaveData data = new CaveData(x, z);
+                        // Create Chunks
 
-                        // Add chunks not loaded around gen chunks
-                        notLoadedChunks.Add(data);
-
-                        foreach (CaveData d in script.chunkList)
-                        {
-                            // If chunk is outside player chunk radius, delete the chunk
-                            if (d.chunkPosition == data.chunkPosition)
-                            {
-                                Destroy(d.chunkObject);
-                                deleteData.Add(d);
-                            }
-                        }
-                    }
-                    else
-                    {
                         bool chunkExists = false;
 
                         foreach (CaveData data in script.chunkList)
@@ -89,13 +68,31 @@ public class ChunkLoading : MonoBehaviour
                             {
                                 chunkExists = true;
                                 break;
-                            }  
+                            }
                         }
 
                         // Create chunk if chunk does not exist
                         if (!chunkExists)
                         {
                             createChunk.Add(new CaveData(x, z));
+                        }
+                    }
+                    else
+                    {
+                        // Remove chunks
+
+                        CaveData data = new CaveData(x, z);
+
+                        // Loop through generated chunks
+                        foreach (CaveData d in script.chunkList)
+                        {
+                            // If chunk is outside player chunk radius, delete the chunk
+                            if (d.chunkPosition == data.chunkPosition)
+                            {
+                                Destroy(d.chunkObject);
+                                script.chunkList.Remove(d);
+                                break;
+                            }
                         }
                     }
                 }

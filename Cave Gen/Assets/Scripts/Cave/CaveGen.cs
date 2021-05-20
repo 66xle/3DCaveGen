@@ -403,7 +403,11 @@ public class CaveGen : MonoBehaviour
         faceCount = 0;
     }
 
-    // Methods
+    /// <summary>
+    /// Get the nearest chunk position
+    /// </summary>
+    /// <param name="position">World position</param>
+    /// <returns></returns>
     public Vector2 GetChunkPosition(Vector3 position)
     {
         float minDistance = 100;
@@ -423,6 +427,11 @@ public class CaveGen : MonoBehaviour
         }
 
         return newChunk;
+    }
+
+    public Vector2 ChunkToWorldPosition(Vector2 chunkPosition)
+    {
+        return new Vector2(chunkPosition.x * 16 + 8.0f, chunkPosition.y * 16 + 8.0f);
     }
 
     /// <summary>

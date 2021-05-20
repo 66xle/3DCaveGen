@@ -37,8 +37,6 @@ public class PlayerMovement : MonoBehaviour
         {
             Raycast();
         }
-
-        Debug.DrawRay(cam.position, cam.forward * 100.0f, Color.red);
     }
 
     void FixedUpdate()
