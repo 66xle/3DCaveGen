@@ -26,7 +26,7 @@ public class PlayerMovement : MonoBehaviour
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
 
-        moveDir = (horizontal * transform.right + vertical * transform.forward).normalized;
+        moveDir = (horizontal * transform.right + vertical * new Vector3(transform.forward.x, 0, transform.forward.z)).normalized;
 
         if (Input.GetKeyDown(KeyCode.Space))
         {

@@ -12,8 +12,6 @@ public class CameraController : MonoBehaviour
     public float sensitivityX = 15f;
     public float sensitivityY = 15f;
 
-    public Camera cam;
-
     float rotX = 0f;
     float rotY = 0f;
 
@@ -37,8 +35,7 @@ public class CameraController : MonoBehaviour
 
         rotX = Mathf.Clamp(rotX, minX, maxX);
 
-        transform.localEulerAngles = new Vector3(0, rotY, 0);
-        cam.transform.localEulerAngles = new Vector3(-rotX, 0, 0);
+        transform.localEulerAngles = new Vector3(-rotX, rotY, 0);
 
     }
 }

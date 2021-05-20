@@ -7,7 +7,6 @@ public class ChunkLoading : MonoBehaviour
     public CaveGen script;
     public Transform player;
 
-    List<CaveData> deleteData = new List<CaveData>();
     List<CaveData> createChunk = new List<CaveData>();
 
     Vector2 currentChunk = new Vector2(-9999, -9999);
@@ -42,7 +41,7 @@ public class ChunkLoading : MonoBehaviour
         // Check if player has moved from to a different chunk
         if (newChunk != currentChunk)
         {
-              createChunk.Clear();
+            createChunk.Clear();
 
             currentChunk = newChunk; // Set player current chunk
 
