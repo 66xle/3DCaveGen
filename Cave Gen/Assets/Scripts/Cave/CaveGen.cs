@@ -434,6 +434,11 @@ public class CaveGen : MonoBehaviour
         return new Vector2(chunkPosition.x * 16 + 8.0f, chunkPosition.y * 16 + 8.0f);
     }
 
+    public Vector3 GetMidPosition(Vector2 chunkPosition)
+    {
+        return new Vector3(chunkPosition.x * 16 + 8.0f, 0, chunkPosition.y * 16 + 8.0f);
+    }
+
     /// <summary>
     /// Change data in a chunk
     /// </summary>

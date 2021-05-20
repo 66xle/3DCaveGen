@@ -15,6 +15,8 @@ public class CameraController : MonoBehaviour
     float rotX = 0f;
     float rotY = 0f;
 
+    public Camera cam;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -35,7 +37,8 @@ public class CameraController : MonoBehaviour
 
         rotX = Mathf.Clamp(rotX, minX, maxX);
 
-        transform.localEulerAngles = new Vector3(-rotX, rotY, 0);
+        transform.localEulerAngles = new Vector3(0, rotY, 0);
+        cam.transform.localEulerAngles = new Vector3(-rotX, 0, 0);
 
     }
 }

@@ -57,7 +57,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (Physics.Raycast(cam.position, cam.forward, out hit, 100.0f, layerMask))
         {
-            Vector3 point = new Vector3(hit.point.x, hit.point.y, hit.point.z);
+            Vector3 point = hit.point;
             point += (new Vector3(hit.normal.x, hit.normal.y, hit.normal.z)) * -0.5f;
 
             script.SetData(point, 0);
