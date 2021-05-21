@@ -153,10 +153,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46a64b79e0328664ab630e683a27d354, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHeight: 100
   chunkDistance: 3
   material: {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
   swapData: 0
+  _seed: 0
+  _minCaveHeight: 1
+  _maxCaveHeight: 100
+  _noiseCutoff: -0.3
+  _surfaceCutoff: -0.25
+  _warpAmplifier: 4
+  _easeInDepth: 14
+  _yCompression: 2
+  _xzCompression: 1
 --- !u!4 &114025011
 Transform:
   m_ObjectHideFlags: 0
@@ -183,15 +191,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5848cab8af4d6e945becad1e3f667cc3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  seed: 0
-  minCaveHeight: 1
-  maxCaveHeight: 100
-  noiseCutoff: -0.3
-  surfaceCutoff: -0.25
-  warpAmplifier: 4
-  easeInDepth: 14
-  yCompression: 2
-  xzCompression: 1
 --- !u!850595691 &199187934
 LightingSettings:
   m_ObjectHideFlags: 0

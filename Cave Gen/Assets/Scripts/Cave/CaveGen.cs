@@ -22,9 +22,21 @@ public class CaveGen : MonoBehaviour
 
     [Header("Cave Values")]
     public byte[,,] chunkData;
-    public int maxHeight = 10;
     public int chunkDistance;
     public Material material;
+    [Tooltip("Gen cave inside out")] public bool swapData = false;
+
+    [Header("Worley Values")]
+    public int _seed = 0;
+    public int _minCaveHeight = 1;
+    public int _maxCaveHeight = 100;
+    [Tooltip("Controls size of caves. Smaller values = larger caves (-1 to 1)")] public float _noiseCutoff = -0.18f;
+    [Tooltip("Controls size of caves at the surface. Smaller values = more caves break through the surface (-1 to 1)")] public float _surfaceCutoff = -0.081f;
+
+    [Tooltip("Controls how much to warp caves. Lower values = straighter caves")] public float _warpAmplifier = 8.0f;
+    [Tooltip("Reduces number of caves at surface level, becoming more common until caves generate normally X number of blocks below the surface")] public float _easeInDepth = 15.0f;
+    [Tooltip("Squishes caves on the Y axis. Lower values = taller caves and more steep drops")] public float _yCompression = 2.0f;
+    [Tooltip("Controls how much to warp caves. Lower values = straighter caves")] public float _xzCompression = 1.0f;
 
     // Mesh Stuff
     private List<MeshData> meshData = new List<MeshData>();
@@ -37,7 +49,6 @@ public class CaveGen : MonoBehaviour
     private int faceCount;
 
 
-    [Tooltip("Gen cave inside out")] public bool swapData = false;
 
     private float startTime;
     private WorleyCave worley;
@@ -48,36 +59,10 @@ public class CaveGen : MonoBehaviour
         worley.Setup();
     }
 
-    void Update()
-    {
-        // Shows middle of every chunk
-        //foreach (CaveData data in chunkList)
-        //{
-        //    Debug.DrawLine(data.midPosition, new Vector3(data.midPosition.x, maxHeight + 20.0f, data.midPosition.z), Color.red);
-        //}
-
-        // Generate Cave again
-        //if (Input.GetKeyDown(KeyCode.G))
-        //{
-        //    DestroyChunk();
-        //    StartGen();
-        //}
-    }
-
-    void DestroyChunk()
-    {
-        // Destory all chunks
-        foreach (CaveData data in chunkList)
-        {
-            Destroy(data.chunkObject);
-            chunkList.Remove(data);
-        }
-    }
-
     public byte Block(int x, int y, int z)
     {
         // Outside of data array
-        if (x >= 16 || x < 0 || y >= maxHeight || y < 0 || z >= 16 || z < 0)
+        if (x >= 16 || x < 0 || y >= _maxCaveHeight || y < 0 || z >= 16 || z < 0)
         {
             return 1;
         }
@@ -236,10 +221,10 @@ public class CaveGen : MonoBehaviour
 
     public void GenerateChunk(int chunkX, int chunkZ)
     {
-        chunkData = new byte[16, maxHeight, 16];
+        chunkData = new byte[16, _maxCaveHeight, 16];
 
         // Fill chunk with solid blocks
-        for (int y = 0; y < maxHeight; y++)
+        for (int y = 0; y < _maxCaveHeight; y++)
         {
             for (int z = 0; z < 16; z++)
             {
@@ -255,7 +240,7 @@ public class CaveGen : MonoBehaviour
         // Swap Air/Block to Block/Air
         if (swapData)
         {
-            for (int y = 0; y < maxHeight; y++)
+            for (int y = 0; y < _maxCaveHeight; y++)
             {
                 for (int z = 0; z < 16; z++)
                 {
@@ -282,14 +267,14 @@ public class CaveGen : MonoBehaviour
         // Loop through chunk data
         for (int x = 0; x < 16; x++)
         {
-            for (int y = 0; y < maxHeight; y++)
+            for (int y = 0; y < _maxCaveHeight; y++)
             {
                 for (int z = 0; z < 16; z++)
                 {
                     // If block is solid
                     if (Block(x, y, z) != 0)
                     {
-                        if (Block(x, y + 1, z) == 0 || y == maxHeight - 1)
+                        if (Block(x, y + 1, z) == 0 || y == _maxCaveHeight - 1)
                         {
                             // Block above is air
                             CubeTop(x, y, z, Block(x, y, z));

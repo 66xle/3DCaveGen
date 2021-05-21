@@ -6,28 +6,36 @@ public class WorleyCave : MonoBehaviour
 {
     const int HAS_CAVES_FLAG = 129;
 
-    public int seed = 0;
-    //public float frequency = 0.05f;
+    WorleyUtil util;
+    FastNoise noisePerlin;
+    CaveGen script;
 
-    public int minCaveHeight = 1;
-    public int maxCaveHeight = 128;
-    [Tooltip("Controls size of caves. Smaller values = larger caves (-1 to 1)")] public float noiseCutoff = -0.18f;
-    [Tooltip("Controls size of caves at the surface. Smaller values = more caves break through the surface (-1 to 1)")] public float surfaceCutoff = -0.081f;
+    int seed;
+    int minCaveHeight;
+    int maxCaveHeight;
 
-    [Tooltip("Controls how much to warp caves. Lower values = straighter caves")] public float warpAmplifier = 8.0f;
-    [Tooltip("Reduces number of caves at surface level, becoming more common until caves generate normally X number of blocks below the surface")] public float easeInDepth = 15.0f;
-    [Tooltip("Squishes caves on the Y axis. Lower values = taller caves and more steep drops")] public float yCompression = 2.0f;
-    [Tooltip("Controls how much to warp caves. Lower values = straighter caves")] public float xzCompression = 1.0f;
-
-
-
-    private WorleyUtil util;
-    private FastNoise noisePerlin;
-    private CaveGen script;
+    float noiseCutoff;
+    float surfaceCutoff;
+    
+    float warpAmplifier;
+    float easeInDepth;
+    float yCompression;
+    float xzCompression;
 
     public void Setup()
     {
         script = GetComponent<CaveGen>();
+
+        seed = script._seed;
+        minCaveHeight = script._minCaveHeight;
+        maxCaveHeight = script._maxCaveHeight;
+
+        noiseCutoff = script._noiseCutoff;
+        surfaceCutoff = script._surfaceCutoff;
+        warpAmplifier = script._warpAmplifier;
+        easeInDepth = script._easeInDepth;
+        yCompression = script._yCompression;
+        xzCompression = script._xzCompression;
 
         util = new WorleyUtil(seed);
         util.SetFrequency(0.016f);
@@ -38,7 +46,7 @@ public class WorleyCave : MonoBehaviour
 
     public void CarveWorleyCaves(int chunkX, int chunkZ)
     {
-        int chunkMaxHeight = script.maxHeight;
+        int chunkMaxHeight = maxCaveHeight;
         float[,,] samples = SampleNoise(chunkX, chunkZ, chunkMaxHeight + 1);
         float oneQuarter = 0.25f;
         float oneHalf = 0.5f;

@@ -8,10 +8,10 @@ public class WorleyUtil
 	public const int Y_PRIME = 31337;
 	public const int Z_PRIME = 6971;
 
-	private FastNoise FASTNOISE;
+	FastNoise FASTNOISE;
 
-    private int seed;
-    private float frequency = 0.01f;
+    int seed;
+    float frequency = 0.01f;
 
     public WorleyUtil(int s)
     {

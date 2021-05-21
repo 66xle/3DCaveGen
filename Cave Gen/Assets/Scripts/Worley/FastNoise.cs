@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class FastNoise
 {
-    private int seed;
-    private float frequency = 0.01f;
+    int seed;
+    float frequency = 0.01f;
 
     public FastNoise(int s)
     {
