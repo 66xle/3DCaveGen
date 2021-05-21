@@ -51,17 +51,17 @@ public class CaveGen : MonoBehaviour
     void Update()
     {
         // Shows middle of every chunk
-        foreach (CaveData data in chunkList)
-        {
-            //Debug.DrawLine(data.midPosition, new Vector3(data.midPosition.x, maxHeight + 20.0f, data.midPosition.z), Color.red);
-        }
+        //foreach (CaveData data in chunkList)
+        //{
+        //    Debug.DrawLine(data.midPosition, new Vector3(data.midPosition.x, maxHeight + 20.0f, data.midPosition.z), Color.red);
+        //}
 
         // Generate Cave again
-        if (Input.GetKeyDown(KeyCode.G))
-        {
-            DestroyChunk();
-            StartGen();
-        }
+        //if (Input.GetKeyDown(KeyCode.G))
+        //{
+        //    DestroyChunk();
+        //    StartGen();
+        //}
     }
 
     void DestroyChunk()
