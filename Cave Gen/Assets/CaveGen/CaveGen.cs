@@ -1,7 +1,4 @@
-﻿using LibNoise.Unity;
-using LibNoise.Unity.Generator;
-using LibNoise.Unity.Operator;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class CaveGen : MonoBehaviour
