@@ -38,6 +38,7 @@ public class CaveGen : MonoBehaviour
     [Tooltip("Squishes caves on the Y axis. Lower values = taller caves and more steep drops")] public float _yCompression = 2.0f;
     [Tooltip("Controls how much to warp caves. Lower values = straighter caves")] public float _xzCompression = 1.0f;
 
+
     // Mesh Stuff
     private List<MeshData> meshData = new List<MeshData>();
     public List<CaveData> chunkList = new List<CaveData>();
@@ -206,7 +207,7 @@ public class CaveGen : MonoBehaviour
     /// </summary>
     public void StartGen()
     {
-        startTime = Time.realtimeSinceStartup;
+        //startTime = Time.realtimeSinceStartup;
 
         for (int chunkX = -chunkDistance; chunkX <= chunkDistance; chunkX++)
         {
@@ -216,7 +217,7 @@ public class CaveGen : MonoBehaviour
             }
         }
 
-        Debug.Log("Loaded in " + (Time.realtimeSinceStartup - startTime) + " Seconds.");
+       // Debug.Log("Loaded in " + (Time.realtimeSinceStartup - startTime) + " Seconds.");
     }
 
     public void GenerateChunk(int chunkX, int chunkZ)
@@ -360,8 +361,14 @@ public class CaveGen : MonoBehaviour
         faceCount = 0;
     }
 
-    void RecalculateMesh(CaveData d)
+    /// <summary>
+    /// Run this to update chunk
+    /// </summary>
+    /// <param name="d"></param>
+    public void RecalculateMesh(CaveData d)
     {
+        CreateMesh();
+
         for (int i = 0; i < meshData.Count; i++)
         {
             MeshData data = meshData[i];
@@ -393,7 +400,7 @@ public class CaveGen : MonoBehaviour
     /// </summary>
     /// <param name="position">World position</param>
     /// <returns></returns>
-    public Vector2 GetChunkPosition(Vector3 position)
+    public Vector2 GetCurrentChunkPosition(Vector3 position)
     {
         float minDistance = 100;
         Vector2 newChunk = new Vector2();
@@ -425,14 +432,13 @@ public class CaveGen : MonoBehaviour
     }
 
     /// <summary>
-    /// Change data in a chunk
+    /// Change data in a chunk and update it
     /// </summary>
     /// <param name="dataPosition">The data is in world position</param>
-    /// <param name="chunkPosition"></param>
     /// <param name="block">Solid = 1, Air = 0</param>
     public void SetData(Vector3 dataPosition, byte data)
     {
-        Vector2 chunkPosition = GetChunkPosition(dataPosition);
+        Vector2 chunkPosition = GetCurrentChunkPosition(dataPosition);
         Vector3 newDataPosition = new Vector3(Mathf.RoundToInt(dataPosition.x - 0.5f) - chunkPosition.x * 16, Mathf.RoundToInt(dataPosition.y + 0.5f), Mathf.RoundToInt(dataPosition.z - 0.5f) - chunkPosition.y * 16);
 
         foreach (CaveData d in chunkList)
@@ -442,7 +448,6 @@ public class CaveGen : MonoBehaviour
                 d.chunkData[(int)newDataPosition.x, (int)newDataPosition.y, (int)newDataPosition.z] = data;
 
                 chunkData = d.chunkData;
-                CreateMesh();
                 RecalculateMesh(d);
 
                 break;

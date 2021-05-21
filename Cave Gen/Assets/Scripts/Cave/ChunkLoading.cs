@@ -7,7 +7,7 @@ public class ChunkLoading : MonoBehaviour
     public CaveGen script;
     public Transform player;
 
-    List<CaveData> createChunk = new List<CaveData>();
+    List<Vector2> createChunk = new List<Vector2>();
 
     Vector2 currentChunk = new Vector2(-9999, -9999);
     Vector2 newChunk;
@@ -20,7 +20,7 @@ public class ChunkLoading : MonoBehaviour
     void Update()
     {
         // Gets the chunk the player is on
-        newChunk = script.GetChunkPosition(player.position);
+        newChunk = script.GetCurrentChunkPosition(player.position);
         ScanChunkRadius();
 
         CreateChunks();
@@ -28,10 +28,10 @@ public class ChunkLoading : MonoBehaviour
 
     void CreateChunks()
     {
-        foreach (CaveData data in createChunk)
+        foreach (Vector2 chunkPos in createChunk)
         {
-            script.GenerateChunk((int)data.chunkPosition.x, (int)data.chunkPosition.y);
-            createChunk.Remove(data);
+            script.GenerateChunk((int)chunkPos.x, (int)chunkPos.y);
+            createChunk.Remove(chunkPos);
             return; // Return so we can create a chunk every frame
         }
     }
@@ -73,20 +73,18 @@ public class ChunkLoading : MonoBehaviour
                         // Create chunk if chunk does not exist
                         if (!chunkExists)
                         {
-                            createChunk.Add(new CaveData(x, z));
+                            createChunk.Add(new Vector2(x, z));
                         }
                     }
                     else
                     {
                         // Remove chunks
 
-                        CaveData data = new CaveData(x, z);
-
                         // Loop through generated chunks
                         foreach (CaveData d in script.chunkList)
                         {
                             // If chunk is outside player chunk radius, delete the chunk
-                            if (d.chunkPosition == data.chunkPosition)
+                            if (d.chunkPosition == new Vector2(x, z))
                             {
                                 Destroy(d.chunkObject);
                                 script.chunkList.Remove(d);

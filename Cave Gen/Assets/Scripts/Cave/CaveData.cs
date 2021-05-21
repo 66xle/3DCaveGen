@@ -9,12 +9,6 @@ public class CaveData
     public Vector2 chunkPosition;
     public GameObject chunkObject;
 
-    public CaveData(int chunkX, int chunkZ)
-    {
-        midPosition = new Vector3(chunkX * 16 + 8.0f, 0, chunkZ * 16 + 8.0f);
-        chunkPosition = new Vector2(chunkX, chunkZ);
-    }
-
     public CaveData(int chunkX, int chunkZ, byte[,,] data, GameObject go)
     {
         midPosition = new Vector3(chunkX * 16 + 8.0f, 0, chunkZ * 16 + 8.0f);
